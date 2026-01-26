@@ -15,7 +15,6 @@ import './styles/light-theme.css';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
   const [selectedMovie, setSelectedMovie] = useState(null);
 
   // Verificar sesión al cargar
@@ -26,14 +25,12 @@ function App() {
     }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
       setUser(session?.user ?? null);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
       setUser(session?.user ?? null);
     });
 
@@ -49,7 +46,6 @@ function App() {
       await supabase.auth.signOut();
     }
     setUser(null);
-    setSession(null);
   };
 
   const handleMovieClick = (movie) => {

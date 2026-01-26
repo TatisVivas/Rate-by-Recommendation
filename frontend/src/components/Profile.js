@@ -5,21 +5,14 @@ import { useTranslation } from '../utils/translations';
 import './Profile.css';
 
 function Profile({ user, onLogout }) {
-  const { preferences, updatePreference, loading: prefsLoading } = usePreferences();
+  const { preferences, updatePreference } = usePreferences();
   const t = useTranslation(preferences.language);
-  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
   const [username, setUsername] = useState('');
   const [savingPrefs, setSavingPrefs] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      loadProfile();
-    }
-  }, [user]);
 
   const loadProfile = async () => {
     if (!user || !supabase) return;
@@ -35,9 +28,7 @@ function Profile({ user, onLogout }) {
       if (error && error.code !== 'PGRST116') throw error;
 
       if (data) {
-        setProfile(data);
         setUsername(data.username || '');
-        // Las preferencias se cargan desde el contexto
       } else {
         // Crear perfil si no existe
         const { error: insertError } = await supabase
@@ -58,6 +49,13 @@ function Profile({ user, onLogout }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleSaveProfile = async () => {
     if (!user || !supabase) return;

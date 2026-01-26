@@ -24,6 +24,7 @@ function Recommendations({ user, onMovieClick }) {
     if (user) {
       loadRecommendations();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadWatchlist = async () => {

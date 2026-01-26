@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import './MovieModal.css';
 
@@ -8,7 +8,6 @@ const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
 function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
   const [movieDetails, setMovieDetails] = useState(null);
-  const [userReview, setUserReview] = useState(null);
   const [rating, setRating] = useState(0);
   const [reviewContent, setReviewContent] = useState('');
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -17,30 +16,7 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [watchlistLoading, setWatchlistLoading] = useState(false);
 
-  useEffect(() => {
-    if (movie) {
-      fetchMovieDetails(movie.id);
-      if (user) {
-        loadUserReview(movie.id);
-        checkWatchlist(movie.id);
-      }
-    }
-  }, [movie, user]);
-
-  const fetchMovieDetails = async (movieId) => {
-    try {
-      const url = `${TMDB_BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES`;
-      const response = await fetch(url);
-      if (response.ok) {
-        const data = await response.json();
-        setMovieDetails(data);
-      }
-    } catch (err) {
-      console.error('Error al cargar detalles:', err);
-    }
-  };
-
-  const loadUserReview = async (movieId) => {
+  const loadUserReview = useCallback(async (movieId) => {
     if (!user) return;
 
     try {
@@ -52,20 +28,18 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
         .single();
 
       if (data) {
-        setUserReview(data);
         setRating(data.rating);
         setReviewContent(data.content || '');
       } else {
-        setUserReview(null);
         setRating(0);
         setReviewContent('');
       }
     } catch (err) {
       console.error('Error al cargar reseña:', err);
     }
-  };
+  }, [user]);
 
-  const checkWatchlist = async (movieId) => {
+  const checkWatchlist = useCallback(async (movieId) => {
     if (!user) {
       setIsInWatchlist(false);
       return;
@@ -82,6 +56,29 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
       setIsInWatchlist(data && !data.error);
     } catch (err) {
       setIsInWatchlist(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (movie) {
+      fetchMovieDetails(movie.id);
+      if (user) {
+        loadUserReview(movie.id);
+        checkWatchlist(movie.id);
+      }
+    }
+  }, [movie, user, loadUserReview, checkWatchlist]);
+
+  const fetchMovieDetails = async (movieId) => {
+    try {
+      const url = `${TMDB_BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES`;
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setMovieDetails(data);
+      }
+    } catch (err) {
+      console.error('Error al cargar detalles:', err);
     }
   };
 

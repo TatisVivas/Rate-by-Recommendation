@@ -7,16 +7,9 @@ const API_KEY = process.env.REACT_APP_TMDB_API_KEY || 'YOUR_API_KEY_HERE';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 function Watchlist({ user, onMovieClick }) {
-  const [watchlist, setWatchlist] = useState([]);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (user) {
-      loadWatchlist();
-    }
-  }, [user]);
 
   const loadWatchlist = async () => {
     if (!user || !supabase) return;
@@ -32,8 +25,6 @@ function Watchlist({ user, onMovieClick }) {
         .order('added_at', { ascending: false });
 
       if (error) throw error;
-
-      setWatchlist(data || []);
 
       // Cargar detalles de cada película
       if (data && data.length > 0) {
@@ -64,6 +55,13 @@ function Watchlist({ user, onMovieClick }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      loadWatchlist();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleRemoveFromWatchlist = async (movieId) => {
     if (!user || !supabase) return;

@@ -42,6 +42,7 @@ export const PreferencesProvider = ({ children, user }) => {
       }
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadPreferences = async () => {
