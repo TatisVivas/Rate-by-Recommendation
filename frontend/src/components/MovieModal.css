@@ -1,0 +1,8 @@
+/* Los estilos del modal ya están en App.css, pero podemos agregar algunos específicos aquí si es necesario */
+.modal-login-prompt {
+  padding: 2rem;
+  text-align: center;
+  color: #b8b8d4;
+  font-size: 1rem;
+}
+

@@ -1,0 +1,191 @@
+export const translations = {
+  es: {
+    // Navbar
+    home: 'Inicio',
+    watchlist: 'Mi Lista',
+    profile: 'Perfil',
+    
+    // Home
+    discover: 'Descubre y Califica Películas',
+    discoverSubtitle: 'Encuentra tus películas favoritas y comparte tus opiniones',
+    searchPlaceholder: 'Busca una película...',
+    search: 'Buscar',
+    searching: 'Buscando...',
+    resultsFound: 'resultado encontrado',
+    resultsFoundPlural: 'resultados encontrados',
+    noResults: 'No se encontraron películas para',
+    welcomeMessage: '👆 Busca una película para comenzar',
+    loadingMovies: 'Cargando películas...',
+    
+    // Watchlist
+    myWatchlist: 'Mi Lista de Seguimiento',
+    moviesSaved: 'película guardada',
+    moviesSavedPlural: 'películas guardadas',
+    loadingList: 'Cargando tu lista...',
+    emptyList: 'Tu lista está vacía',
+    emptyListText: 'Agrega películas a tu lista desde la página de inicio haciendo clic en cualquier película',
+    removeFromList: 'Eliminar de la lista',
+    
+    // Profile
+    myProfile: 'Mi Perfil',
+    personalInfo: 'Información Personal',
+    email: 'Email',
+    emailHint: 'El email no se puede modificar',
+    username: 'Nombre de Usuario',
+    saveChanges: 'Guardar Cambios',
+    saving: 'Guardando...',
+    profileUpdated: 'Perfil actualizado exitosamente',
+    preferences: 'Preferencias',
+    notifications: 'Notificaciones',
+    notificationsDesc: 'Recibir notificaciones por email',
+    language: 'Idioma',
+    languageDesc: 'Idioma de la interfaz',
+    theme: 'Tema',
+    themeDesc: 'Apariencia de la aplicación',
+    dark: 'Oscuro',
+    light: 'Claro',
+    session: 'Sesión',
+    logout: 'Cerrar Sesión',
+    
+    // Movie Modal
+    rateMovie: 'Califica esta película (1-5 estrellas):',
+    selectRating: 'Selecciona una calificación',
+    review: 'Reseña (opcional):',
+    reviewPlaceholder: 'Escribe tu opinión sobre esta película...',
+    saveReview: 'Guardar Reseña',
+    savingReview: 'Guardando...',
+    reviewSaved: '¡Reseña guardada exitosamente!',
+    addToList: '+ Agregar a Lista',
+    inList: '✓ En Lista',
+    synopsis: 'Sinopsis',
+    minutes: 'minutos',
+    votes: 'votos',
+    
+    // Auth
+    login: 'Iniciar Sesión',
+    register: 'Registrarse',
+    noAccount: '¿No tienes cuenta?',
+    haveAccount: '¿Ya tienes cuenta?',
+    signUp: 'Regístrate',
+    signIn: 'Inicia sesión',
+    verifyEmail: 'Verifica tu correo electrónico',
+    emailSent: 'Hemos enviado un enlace de confirmación a',
+    checkSpam: 'Importante: Si no encuentras el correo, revisa tu carpeta de spam o correo no deseado',
+    confirmAccount: 'Una vez que confirmes tu cuenta, podrás iniciar sesión normalmente',
+    
+    // Recommendations
+    recommendations: 'Recomendaciones',
+    recommendationsSubtitle: 'Basado en las {count} películas de tu lista',
+    recommendationsEmptySubtitle: 'Agrega películas a tu lista para obtener recomendaciones personalizadas',
+    refreshRecommendations: 'Actualizar Recomendaciones',
+    loading: 'Cargando...',
+    loadingRecommendations: 'Analizando tu lista y generando recomendaciones...',
+    loginRequired: 'Debes iniciar sesión para ver recomendaciones',
+    basedOnYourWatchlist: 'Basadas en tu Lista',
+    similarMovies: 'Películas Similares',
+    popularInYourGenres: 'Populares en tus Géneros',
+    noRecommendations: 'No hay recomendaciones disponibles en este momento',
+    noSimilarMovies: 'No se encontraron películas similares',
+    noPopularMovies: 'No hay películas populares disponibles',
+    emptyWatchlistTitle: 'Tu lista está vacía',
+    emptyWatchlistText: 'Agrega películas a tu lista para recibir recomendaciones personalizadas',
+  },
+  en: {
+    // Navbar
+    home: 'Home',
+    watchlist: 'My List',
+    profile: 'Profile',
+    
+    // Home
+    discover: 'Discover and Rate Movies',
+    discoverSubtitle: 'Find your favorite movies and share your opinions',
+    searchPlaceholder: 'Search for a movie...',
+    search: 'Search',
+    searching: 'Searching...',
+    resultsFound: 'result found',
+    resultsFoundPlural: 'results found',
+    noResults: 'No movies found for',
+    welcomeMessage: '👆 Search for a movie to get started',
+    loadingMovies: 'Loading movies...',
+    
+    // Watchlist
+    myWatchlist: 'My Watchlist',
+    moviesSaved: 'movie saved',
+    moviesSavedPlural: 'movies saved',
+    loadingList: 'Loading your list...',
+    emptyList: 'Your list is empty',
+    emptyListText: 'Add movies to your list from the home page by clicking on any movie',
+    removeFromList: 'Remove from list',
+    
+    // Profile
+    myProfile: 'My Profile',
+    personalInfo: 'Personal Information',
+    email: 'Email',
+    emailHint: 'Email cannot be modified',
+    username: 'Username',
+    saveChanges: 'Save Changes',
+    saving: 'Saving...',
+    profileUpdated: 'Profile updated successfully',
+    preferences: 'Preferences',
+    notifications: 'Notifications',
+    notificationsDesc: 'Receive email notifications',
+    language: 'Language',
+    languageDesc: 'Interface language',
+    theme: 'Theme',
+    themeDesc: 'Application appearance',
+    dark: 'Dark',
+    light: 'Light',
+    session: 'Session',
+    logout: 'Log Out',
+    
+    // Movie Modal
+    rateMovie: 'Rate this movie (1-5 stars):',
+    selectRating: 'Select a rating',
+    review: 'Review (optional):',
+    reviewPlaceholder: 'Write your opinion about this movie...',
+    saveReview: 'Save Review',
+    savingReview: 'Saving...',
+    reviewSaved: 'Review saved successfully!',
+    addToList: '+ Add to List',
+    inList: '✓ In List',
+    synopsis: 'Synopsis',
+    minutes: 'minutes',
+    votes: 'votes',
+    
+    // Auth
+    login: 'Sign In',
+    register: 'Sign Up',
+    noAccount: "Don't have an account?",
+    haveAccount: 'Already have an account?',
+    signUp: 'Sign Up',
+    signIn: 'Sign In',
+    verifyEmail: 'Verify your email',
+    emailSent: 'We have sent a confirmation link to',
+    checkSpam: 'Important: If you cannot find the email, check your spam or junk folder',
+    confirmAccount: 'Once you confirm your account, you will be able to sign in normally',
+    
+    // Recommendations
+    recommendations: 'Recommendations',
+    recommendationsSubtitle: 'Based on the {count} movies in your list',
+    recommendationsEmptySubtitle: 'Add movies to your list to get personalized recommendations',
+    refreshRecommendations: 'Refresh Recommendations',
+    loading: 'Loading...',
+    loadingRecommendations: 'Analyzing your list and generating recommendations...',
+    loginRequired: 'You must be logged in to see recommendations',
+    basedOnYourWatchlist: 'Based on Your List',
+    similarMovies: 'Similar Movies',
+    popularInYourGenres: 'Popular in Your Genres',
+    noRecommendations: 'No recommendations available at this time',
+    noSimilarMovies: 'No similar movies found',
+    noPopularMovies: 'No popular movies available',
+    emptyWatchlistTitle: 'Your list is empty',
+    emptyWatchlistText: 'Add movies to your list to receive personalized recommendations',
+  },
+};
+
+export const useTranslation = (language = 'es') => {
+  return (key) => {
+    return translations[language]?.[key] || translations.es[key] || key;
+  };
+};
+

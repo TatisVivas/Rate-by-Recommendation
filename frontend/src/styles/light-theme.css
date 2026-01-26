@@ -1,0 +1,50 @@
+/* Estilos adicionales para tema claro - corrige todos los textos blancos */
+
+:root.light-theme,
+.light-theme {
+  /* Textos principales */
+  color: #1e1e2e !important;
+}
+
+:root.light-theme *,
+.light-theme * {
+  /* Asegurar que los textos hereden el color correcto */
+}
+
+/* Profile - textos adicionales */
+:root.light-theme .profile-empty,
+.light-theme .profile-empty,
+:root.light-theme .profile-loading,
+.light-theme .profile-loading,
+:root.light-theme .profile-loading p,
+.light-theme .profile-loading p {
+  color: #666666 !important;
+}
+
+:root.light-theme .preference-saving,
+.light-theme .preference-saving {
+  color: #666666 !important;
+}
+
+/* Watchlist - textos adicionales */
+:root.light-theme .watchlist-loading,
+.light-theme .watchlist-loading,
+:root.light-theme .watchlist-loading p,
+.light-theme .watchlist-loading p {
+  color: #666666 !important;
+}
+
+/* Auth - textos adicionales */
+:root.light-theme .auth-switch p,
+.light-theme .auth-switch p {
+  color: #666666 !important;
+}
+
+/* Home - textos adicionales */
+:root.light-theme .loading-container,
+.light-theme .loading-container,
+:root.light-theme .loading-container p,
+.light-theme .loading-container p {
+  color: #666666 !important;
+}
+
