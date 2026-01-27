@@ -5,6 +5,7 @@ import { PreferencesProvider } from './context/PreferencesContext';
 import Navbar from './components/Navbar';
 import Auth from './components/Auth';
 import Home from './pages/Home';
+import Confirmacion from './pages/Confirmacion';
 import Watchlist from './components/Watchlist';
 import Recommendations from './components/Recommendations';
 import Profile from './components/Profile';
@@ -60,81 +61,100 @@ function App() {
     // Esto se puede usar para refrescar la lista si es necesario
   };
 
-  // Si no hay usuario, mostrar pantalla de autenticación
-  if (!user) {
+  // Componente para rutas protegidas
+  const ProtectedRoutes = () => {
+    if (!user) {
+      return (
+        <>
+          <header className="app-header-auth">
+            <div className="header-content">
+              <h1 className="app-title">Rate by Recommendation</h1>
+              <p className="app-subtitle">Inicia sesión para comenzar</p>
+            </div>
+          </header>
+          <main className="app-main">
+            <Auth onAuthChange={handleAuthChange} />
+          </main>
+        </>
+      );
+    }
+
     return (
-      <div className="App">
-        <header className="app-header-auth">
-          <div className="header-content">
-            <h1 className="app-title">Rate by Recommendation</h1>
-            <p className="app-subtitle">Inicia sesión para comenzar</p>
-          </div>
-        </header>
+      <PreferencesProvider user={user}>
+        <SplashCursor />
+        <Navbar user={user} onLogout={handleLogout} />
+        
         <main className="app-main">
-          <Auth onAuthChange={handleAuthChange} />
+          <Routes>
+            <Route 
+              path="/" 
+              element={<Home user={user} onMovieClick={handleMovieClick} />} 
+            />
+            <Route 
+              path="/watchlist" 
+              element={<Watchlist user={user} onMovieClick={handleMovieClick} />} 
+            />
+            <Route 
+              path="/recommendations" 
+              element={<Recommendations user={user} onMovieClick={handleMovieClick} />} 
+            />
+            <Route 
+              path="/profile" 
+              element={<Profile user={user} onLogout={handleLogout} />} 
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </main>
-      </div>
+
+        <footer className="app-footer">
+          <p className="footer-text">
+            This product uses the{' '}
+            <a 
+              href="https://www.themoviedb.org/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="footer-link"
+            >
+              TMDB API
+            </a>
+            {' '}but is not endorsed or certified by TMDB.
+          </p>
+          <p className="footer-text">
+            © {new Date().getFullYear()} Rate by Recommendation - Tatis Vivas
+          </p>
+        </footer>
+
+        {selectedMovie && (
+          <MovieModal
+            movie={selectedMovie}
+            user={user}
+            onClose={handleCloseModal}
+            onWatchlistUpdate={handleWatchlistUpdate}
+          />
+        )}
+      </PreferencesProvider>
     );
-  }
+  };
 
   return (
-    <PreferencesProvider user={user}>
-      <Router>
-        <div className="App">
-          <SplashCursor />
-          <Navbar user={user} onLogout={handleLogout} />
+    <Router>
+      <div className="App">
+        <Routes>
+          {/* Ruta pública para confirmación de cuenta */}
+          <Route 
+            path="/confirmacion" 
+            element={
+              <main className="app-main">
+                <Confirmacion />
+              </main>
+            } 
+          />
           
-          <main className="app-main">
-            <Routes>
-              <Route 
-                path="/" 
-                element={<Home user={user} onMovieClick={handleMovieClick} />} 
-              />
-              <Route 
-                path="/watchlist" 
-                element={<Watchlist user={user} onMovieClick={handleMovieClick} />} 
-              />
-              <Route 
-                path="/recommendations" 
-                element={<Recommendations user={user} onMovieClick={handleMovieClick} />} 
-              />
-              <Route 
-                path="/profile" 
-                element={<Profile user={user} onLogout={handleLogout} />} 
-              />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
-
-          <footer className="app-footer">
-            <p className="footer-text">
-              This product uses the{' '}
-              <a 
-                href="https://www.themoviedb.org/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="footer-link"
-              >
-                TMDB API
-              </a>
-              {' '}but is not endorsed or certified by TMDB.
-            </p>
-            <p className="footer-text">
-              © {new Date().getFullYear()} Rate by Recommendation - Tatis Vivas
-            </p>
-          </footer>
-
-          {selectedMovie && (
-            <MovieModal
-              movie={selectedMovie}
-              user={user}
-              onClose={handleCloseModal}
-              onWatchlistUpdate={handleWatchlistUpdate}
-            />
-          )}
-        </div>
-      </Router>
-    </PreferencesProvider>
+          {/* Todas las demás rutas */}
+          <Route path="*" element={<ProtectedRoutes />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

@@ -1,0 +1,345 @@
+.confirmacion-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+  transition: background 0.3s ease;
+}
+
+:root.light-theme .confirmacion-container,
+.light-theme .confirmacion-container {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+.confirmacion-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 25px;
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  animation: fadeInUp 0.6s ease-out;
+  transition: all 0.3s ease;
+}
+
+:root.light-theme .confirmacion-card,
+.light-theme .confirmacion-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Success Icon */
+.success-icon {
+  margin: 0 auto 2rem;
+  width: 120px;
+  height: 120px;
+  position: relative;
+  animation: scaleIn 0.5s ease-out 0.2s both;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.checkmark-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.checkmark-circle {
+  fill: none;
+  stroke: #28a745;
+  stroke-width: 4;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  animation: drawCircle 0.6s ease-out 0.3s forwards;
+}
+
+@keyframes drawCircle {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.checkmark-check {
+  fill: none;
+  stroke: #28a745;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: drawCheck 0.4s ease-out 0.9s forwards;
+}
+
+@keyframes drawCheck {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Title */
+.confirmacion-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+  animation: fadeIn 0.6s ease-out 0.4s both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Message */
+.confirmacion-message {
+  font-size: 1.2rem;
+  color: #b8b8d4;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  animation: fadeIn 0.6s ease-out 0.5s both;
+  transition: color 0.3s ease;
+}
+
+:root.light-theme .confirmacion-message,
+.light-theme .confirmacion-message {
+  color: #666666;
+}
+
+.brand-name {
+  color: #667eea;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+:root.light-theme .brand-name,
+.light-theme .brand-name {
+  color: #764ba2;
+}
+
+/* Features List */
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: fadeIn 0.6s ease-out 0.6s both;
+  transition: all 0.3s ease;
+}
+
+:root.light-theme .features-list,
+.light-theme .features-list {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #ffffff;
+  font-size: 1.1rem;
+  padding: 0.5rem;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.feature-item:hover {
+  transform: translateX(5px);
+}
+
+:root.light-theme .feature-item,
+.light-theme .feature-item {
+  color: #1e1e2e;
+}
+
+.feature-icon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Button */
+.confirmacion-actions {
+  margin: 2.5rem 0 1.5rem;
+  animation: fadeIn 0.6s ease-out 0.7s both;
+}
+
+.confirmacion-button {
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.confirmacion-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.confirmacion-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.confirmacion-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+}
+
+.confirmacion-button:active {
+  transform: translateY(-1px);
+}
+
+.confirmacion-button span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hint */
+.confirmacion-hint {
+  font-size: 0.95rem;
+  color: #b8b8d4;
+  margin-top: 1.5rem;
+  font-style: italic;
+  animation: fadeIn 0.6s ease-out 0.8s both;
+  transition: color 0.3s ease;
+}
+
+:root.light-theme .confirmacion-hint,
+.light-theme .confirmacion-hint {
+  color: #666666;
+}
+
+/* Loading State */
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #b8b8d4;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+:root.light-theme .loading-text,
+.light-theme .loading-text {
+  color: #666666;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .confirmacion-container {
+    padding: 1.5rem;
+  }
+
+  .confirmacion-card {
+    padding: 2.5rem 2rem;
+  }
+
+  .confirmacion-title {
+    font-size: 2rem;
+  }
+
+  .confirmacion-message {
+    font-size: 1.1rem;
+  }
+
+  .success-icon {
+    width: 100px;
+    height: 100px;
+  }
+
+  .confirmacion-button {
+    padding: 0.9rem 2.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .confirmacion-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .confirmacion-title {
+    font-size: 1.75rem;
+  }
+
+  .confirmacion-message {
+    font-size: 1rem;
+  }
+
+  .features-list {
+    padding: 1rem;
+  }
+
+  .feature-item {
+    font-size: 1rem;
+  }
+
+  .confirmacion-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    width: 100%;
+  }
+}
