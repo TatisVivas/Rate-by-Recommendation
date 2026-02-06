@@ -12,6 +12,7 @@ function Circles({ user }) {
   const [description, setDescription] = useState('');
   const [error, setError] = useState(null);
   const [copiedCircleId, setCopiedCircleId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const loadCircles = async () => {
     if (!user || !supabase) return;
@@ -95,6 +96,7 @@ function Circles({ user }) {
 
       setName('');
       setDescription('');
+      setIsModalOpen(false);
       await loadCircles();
     } catch (err) {
       console.error('Error al crear círculo:', err);
@@ -139,117 +141,164 @@ function Circles({ user }) {
   return (
     <div className="circles-container">
       <div className="circles-header">
-        <h2 className="circles-title">👥 Mis Círculos</h2>
-        <p className="circles-subtitle">
-          Crea círculos para compartir tus recomendaciones con amigos y familia.
-        </p>
+        <div className="circles-header-content">
+          <div>
+            <h2 className="circles-title">👥 Mis Círculos</h2>
+            <p className="circles-subtitle">
+              Crea círculos para compartir tus recomendaciones con amigos y familia.
+            </p>
+          </div>
+          <button
+            className="circles-create-group-button"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <span className="circles-create-icon">+</span>
+            <span>Crear grupo</span>
+          </button>
+        </div>
       </div>
 
-      <div className="circles-content">
-        <div className="circles-form-card">
-          <h3 className="circles-section-title">Crear nuevo círculo</h3>
-          <form onSubmit={handleCreateCircle} className="circles-form">
-            <div className="circles-field">
-              <label htmlFor="circle-name">Nombre del círculo</label>
-              <input
-                id="circle-name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Familia, Amigos cinéfilos, Compañeros de trabajo..."
-              />
-            </div>
-            <div className="circles-field">
-              <label htmlFor="circle-description">Descripción (opcional)</label>
-              <textarea
-                id="circle-description"
-                rows={3}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe brevemente el propósito del círculo."
-              />
-            </div>
-            {error && (
-              <div className="circles-error">
-                <p>{error}</p>
+      {loading ? (
+        <div className="circles-loading">
+          <div className="spinner" />
+          <p>Cargando círculos...</p>
+        </div>
+      ) : circles.length === 0 ? (
+        <div className="circles-empty-state">
+          <div className="circles-empty-icon">👥</div>
+          <h3 className="circles-empty-title">Aún no tienes círculos</h3>
+          <p className="circles-empty-text">
+            Crea tu primer círculo para empezar a compartir recomendaciones con tus amigos y familia.
+          </p>
+          <button
+            className="circles-create-group-button-empty"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <span className="circles-create-icon">+</span>
+            <span>Crear grupo</span>
+          </button>
+        </div>
+      ) : (
+        <div className="circles-grid">
+          {circles.map((circle) => (
+            <div key={circle.id} className="circles-card">
+              <div className="circles-card-header">
+                <h3 className="circles-card-name">{circle.name}</h3>
+                {circle.description && (
+                  <p className="circles-card-description">{circle.description}</p>
+                )}
               </div>
-            )}
-            <button
-              type="submit"
-              className="circles-create-button"
-              disabled={creating}
-            >
-              {creating ? 'Creando círculo...' : 'Crear círculo'}
-            </button>
-          </form>
-        </div>
-
-        <div className="circles-list-card">
-          <h3 className="circles-section-title">Tus círculos</h3>
-
-          {loading ? (
-            <div className="circles-loading">
-              <div className="spinner" />
-              <p>Cargando círculos...</p>
-            </div>
-          ) : circles.length === 0 ? (
-            <div className="circles-empty">
-              <p>Aún no tienes círculos. ¡Crea el primero arriba!</p>
-            </div>
-          ) : (
-            <ul className="circles-list">
-              {circles.map((circle) => (
-                <li key={circle.id} className="circles-item">
-                  <div className="circles-item-main">
-                    <h4 className="circles-item-name">{circle.name}</h4>
-                    {circle.description && (
-                      <p className="circles-item-description">{circle.description}</p>
-                    )}
-                  </div>
-                  <div className="circles-item-invite">
-                    <span className="circles-invite-label">Link de invitación:</span>
-                    <div className="circles-invite-input-container">
-                      <input
-                        className="circles-invite-input"
-                        type="text"
-                        readOnly
-                        value={getInviteUrl(circle.invite_code)}
-                        onFocus={(e) => e.target.select()}
-                      />
-                      <button
-                        className="circles-copy-button"
-                        onClick={() => handleCopyLink(circle.id, circle.invite_code)}
-                        title="Copiar link"
-                        aria-label="Copiar link de invitación"
-                      >
-                        {copiedCircleId === circle.id ? (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        ) : (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                    <p className="circles-invite-hint">
-                      Comparte este link para que otras personas se unan a tu círculo.
-                    </p>
-                  </div>
+              <div className="circles-card-invite">
+                <span className="circles-invite-label">Link de invitación:</span>
+                <div className="circles-invite-input-container">
+                  <input
+                    className="circles-invite-input"
+                    type="text"
+                    readOnly
+                    value={getInviteUrl(circle.invite_code)}
+                    onFocus={(e) => e.target.select()}
+                  />
                   <button
-                    className="circles-view-button"
-                    onClick={() => navigate(`/circles/${circle.id}`)}
+                    className="circles-copy-button"
+                    onClick={() => handleCopyLink(circle.id, circle.invite_code)}
+                    title="Copiar link"
+                    aria-label="Copiar link de invitación"
                   >
-                    Ver recomendaciones →
+                    {copiedCircleId === circle.id ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
                   </button>
-                </li>
-              ))}
-            </ul>
-          )}
+                </div>
+              </div>
+              <button
+                className="circles-card-button"
+                onClick={() => navigate(`/circles/${circle.id}`)}
+              >
+                Ver recomendaciones →
+              </button>
+            </div>
+          ))}
         </div>
-      </div>
+      )}
+
+      {/* Modal para crear círculo */}
+      {isModalOpen && (
+        <div className="circles-modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="circles-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="circles-modal-header">
+              <h3 className="circles-modal-title">Crear nuevo círculo</h3>
+              <button
+                className="circles-modal-close"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setName('');
+                  setDescription('');
+                  setError(null);
+                }}
+                aria-label="Cerrar"
+              >
+                ×
+              </button>
+            </div>
+            <form onSubmit={handleCreateCircle} className="circles-modal-form">
+              <div className="circles-field">
+                <label htmlFor="circle-name">Nombre del círculo</label>
+                <input
+                  id="circle-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Familia, Amigos cinéfilos, Compañeros de trabajo..."
+                  autoFocus
+                />
+              </div>
+              <div className="circles-field">
+                <label htmlFor="circle-description">Descripción (opcional)</label>
+                <textarea
+                  id="circle-description"
+                  rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe brevemente el propósito del círculo."
+                />
+              </div>
+              {error && (
+                <div className="circles-error">
+                  <p>{error}</p>
+                </div>
+              )}
+              <div className="circles-modal-actions">
+                <button
+                  type="button"
+                  className="circles-modal-cancel"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setName('');
+                    setDescription('');
+                    setError(null);
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="circles-modal-submit"
+                  disabled={creating}
+                >
+                  {creating ? 'Creando...' : 'Crear círculo'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
