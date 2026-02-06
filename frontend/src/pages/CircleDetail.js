@@ -163,7 +163,7 @@ function CircleDetail({ user, onMovieClick }) {
     } finally {
       setLoading(false);
     }
-  }, [user, id]);
+  }, [user, id, t]);
 
   useEffect(() => {
     loadCircleDetails();
@@ -311,9 +311,9 @@ function CircleDetail({ user, onMovieClick }) {
           {sharedReviews.length === 0 ? (
             <div className="circle-detail-empty-reviews">
               <p className="empty-icon">🎬</p>
-              <p className="empty-title">{t('noRecommendations')}</p>
+              <p className="empty-title">{t('noCircleRecommendations')}</p>
               <p className="empty-text">
-                {t('noRecommendationsText')}
+                {t('noCircleRecommendationsText')}
               </p>
             </div>
           ) : (
