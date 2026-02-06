@@ -116,7 +116,7 @@ movie-app-fullstack/
 
 Este proyecto utiliza la API de TMDb pero no está respaldado ni certificado por TMDb.
 
-© 2024 Rate by Recommendation - Tatis Vivas
+© 2026 Rate by Recommendation - Tatis Vivas
 
 ## 🙏 Agradecimientos
 
