@@ -185,22 +185,6 @@ function Profile({ user, onLogout }) {
           <div className="preferences-list">
             <div className="preference-item">
               <div className="preference-info">
-                <span className="preference-label">{t('notifications')}</span>
-                <span className="preference-description">{t('notificationsDesc')}</span>
-              </div>
-              <label className="toggle-switch">
-                <input
-                  type="checkbox"
-                  checked={preferences.notifications}
-                  onChange={(e) => handlePreferenceChange('notifications', e.target.checked)}
-                  disabled={savingPrefs}
-                />
-                <span className="toggle-slider"></span>
-              </label>
-            </div>
-
-            <div className="preference-item">
-              <div className="preference-info">
                 <span className="preference-label">{t('language')}</span>
                 <span className="preference-description">{t('languageDesc')}</span>
               </div>
