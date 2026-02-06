@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { usePreferences } from '../context/PreferencesContext';
 import { useTranslation } from '../utils/translations';
@@ -19,13 +19,15 @@ function Recommendations({ user, onMovieClick }) {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const loadIdRef = useRef(0);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    if (user) {
-      loadRecommendations();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const loadWatchlist = async () => {
     if (!user || !supabase) return [];
@@ -102,31 +104,36 @@ function Recommendations({ user, onMovieClick }) {
     });
   };
 
-  const loadRecommendations = async () => {
+  const loadRecommendations = useCallback(async () => {
     if (!user || !supabase) return;
 
+    const thisLoadId = ++loadIdRef.current;
     setLoading(true);
     setError(null);
 
+    const isCancelled = () => !mountedRef.current || thisLoadId !== loadIdRef.current;
+
     try {
-      // Obtener watchlist del usuario
       const watchlistData = await loadWatchlist();
+      if (isCancelled()) return;
       setWatchlist(watchlistData);
 
       if (watchlistData.length === 0) {
+        setRecommendations({
+          basedOnWatchlist: [],
+          similarMovies: [],
+          popularRecommendations: []
+        });
         setLoading(false);
         return;
       }
 
-      // Obtener IDs de películas en watchlist
       const watchlistIds = watchlistData.map(item => item.movie_id);
       const watchlistSet = new Set(watchlistIds);
 
-      // Arrays para almacenar todas las recomendaciones
       let allRecommendations = [];
       let allSimilar = [];
 
-      // Para cada película en la watchlist, obtener recomendaciones y similares
       const recommendationPromises = watchlistIds.slice(0, 5).map(async (movieId) => {
         const [recs, similar] = await Promise.all([
           fetchMovieRecommendations(movieId),
@@ -136,14 +143,13 @@ function Recommendations({ user, onMovieClick }) {
       });
 
       const results = await Promise.all(recommendationPromises);
+      if (isCancelled()) return;
 
-      // Combinar todas las recomendaciones
       results.forEach(({ recommendations: recs, similar }) => {
         allRecommendations = [...allRecommendations, ...recs];
         allSimilar = [...allSimilar, ...similar];
       });
 
-      // Deduplicar y filtrar películas ya en watchlist
       const filteredRecommendations = deduplicateMovies(
         allRecommendations.filter(movie => !watchlistSet.has(movie.id))
       );
@@ -151,46 +157,42 @@ function Recommendations({ user, onMovieClick }) {
         allSimilar.filter(movie => !watchlistSet.has(movie.id))
       );
 
-      // Obtener películas populares como recomendación adicional
       let popularMovies = [];
-      if (watchlistIds.length > 0) {
-        try {
-          // Obtener géneros de las películas en watchlist
-          const genrePromises = watchlistIds.slice(0, 3).map(id => fetchMovieDetails(id));
-          const movieDetails = await Promise.all(genrePromises);
-          const genres = new Set();
-          movieDetails.forEach(movie => {
-            if (movie && movie.genres) {
-              movie.genres.forEach(genre => genres.add(genre.id));
-            }
-          });
+      try {
+        const genrePromises = watchlistIds.slice(0, 3).map(id => fetchMovieDetails(id));
+        const movieDetails = await Promise.all(genrePromises);
+        if (isCancelled()) return;
 
-          // Si hay géneros, buscar películas populares de esos géneros
-          if (genres.size > 0) {
-            const genreIds = Array.from(genres).slice(0, 3).join(',');
-            const response = await fetch(
-              `${TMDB_BASE_URL}/discover/movie?api_key=${API_KEY}&language=es-ES&sort_by=popularity.desc&with_genres=${genreIds}&page=1`
-            );
-            if (response.ok) {
-              const data = await response.json();
-              popularMovies = data.results || [];
-            }
+        const genres = new Set();
+        movieDetails.forEach(movie => {
+          if (movie && movie.genres) {
+            movie.genres.forEach(genre => genres.add(genre.id));
           }
-        } catch (err) {
-          console.error('Error al obtener películas populares:', err);
+        });
+
+        if (genres.size > 0) {
+          const genreIds = Array.from(genres).slice(0, 3).join(',');
+          const response = await fetch(
+            `${TMDB_BASE_URL}/discover/movie?api_key=${API_KEY}&language=es-ES&sort_by=popularity.desc&with_genres=${genreIds}&page=1`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            popularMovies = data.results || [];
+          }
         }
+      } catch (err) {
+        console.error('Error al obtener películas populares:', err);
       }
 
-      // Filtrar películas populares que no estén en watchlist
+      if (isCancelled()) return;
+
       const filteredPopular = deduplicateMovies(
         popularMovies.filter(movie => !watchlistSet.has(movie.id))
       ).slice(0, 20);
 
-      // Ordenar por popularidad y limitar cantidad
       const sortedRecommendations = filteredRecommendations
         .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
         .slice(0, 20);
-      
       const sortedSimilar = filteredSimilar
         .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
         .slice(0, 20);
@@ -201,12 +203,20 @@ function Recommendations({ user, onMovieClick }) {
         popularRecommendations: filteredPopular
       });
     } catch (err) {
-      setError(`Error al cargar recomendaciones: ${err.message}`);
+      if (!isCancelled()) {
+        setError(`Error al cargar recomendaciones: ${err.message}`);
+      }
       console.error('Error:', err);
     } finally {
-      setLoading(false);
+      if (!isCancelled()) setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadRecommendations();
+    }
+  }, [user, loadRecommendations]);
 
   if (!user) {
     return (

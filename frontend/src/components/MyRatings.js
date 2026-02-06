@@ -54,12 +54,12 @@ function MyRatings({ user, onMovieClick }) {
         setItems([]);
       }
     } catch (err) {
-      setError(err.message || t('errorLoadingRatings'));
+      setError(err.message || 'Error al cargar tus calificaciones');
       console.error('Error:', err);
     } finally {
       setLoading(false);
     }
-  }, [user, preferences.language, t]);
+  }, [user, preferences.language]);
 
   useEffect(() => {
     if (user) {
