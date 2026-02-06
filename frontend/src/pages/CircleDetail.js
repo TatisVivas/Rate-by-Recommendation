@@ -12,8 +12,12 @@ function CircleDetail({ user, onMovieClick }) {
   const navigate = useNavigate();
   const [circle, setCircle] = useState(null);
   const [sharedReviews, setSharedReviews] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [removingMember, setRemovingMember] = useState(null);
+  const [showMembers, setShowMembers] = useState(false);
 
   const loadCircleDetails = useCallback(async () => {
     if (!user || !supabase || !id) return;
@@ -31,6 +35,40 @@ function CircleDetail({ user, onMovieClick }) {
 
       if (circleError) throw circleError;
       setCircle(circleData);
+
+      // Cargar miembros del círculo
+      const { data: membersData, error: membersError } = await supabase
+        .from('circle_members')
+        .select('user_id, role, joined_at')
+        .eq('circle_id', id)
+        .order('joined_at', { ascending: true });
+
+      if (membersError) {
+        console.error('Error al cargar miembros:', membersError);
+      } else {
+        // Encontrar el rol del usuario actual
+        const currentUserMember = membersData?.find((m) => m.user_id === user.id);
+        setUserRole(currentUserMember?.role || null);
+
+        // Cargar perfiles para los miembros
+        const memberUserIds = membersData?.map((m) => m.user_id) || [];
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, username')
+          .in('id', memberUserIds);
+
+        const profilesMap = {};
+        (profilesData || []).forEach((profile) => {
+          profilesMap[profile.id] = profile.username || 'Usuario';
+        });
+
+        const membersWithProfiles = (membersData || []).map((member) => ({
+          ...member,
+          username: profilesMap[member.user_id] || 'Usuario',
+        }));
+
+        setMembers(membersWithProfiles);
+      }
 
       // Cargar reseñas compartidas en este círculo (sin join anidado)
       const { data: sharesData, error: sharesError } = await supabase
@@ -128,6 +166,30 @@ function CircleDetail({ user, onMovieClick }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, user]);
 
+  const handleRemoveMember = async (memberUserId) => {
+    if (!user || !supabase || !id) return;
+    if (userRole !== 'owner') return; // Solo el owner puede eliminar miembros
+
+    setRemovingMember(memberUserId);
+    try {
+      const { error } = await supabase
+        .from('circle_members')
+        .delete()
+        .eq('circle_id', id)
+        .eq('user_id', memberUserId);
+
+      if (error) throw error;
+
+      // Recargar los detalles del círculo
+      await loadCircleDetails();
+    } catch (err) {
+      console.error('Error al eliminar miembro:', err);
+      setError('No se pudo eliminar el miembro. Intenta de nuevo.');
+    } finally {
+      setRemovingMember(null);
+    }
+  };
+
   if (!user) {
     return (
       <div className="circle-detail-container">
@@ -163,10 +225,25 @@ function CircleDetail({ user, onMovieClick }) {
       ) : (
         <>
           <div className="circle-detail-header">
-            <h2 className="circle-detail-title">👥 {circle.name}</h2>
-            {circle.description && (
-              <p className="circle-detail-description">{circle.description}</p>
-            )}
+            <div className="circle-detail-header-top">
+              <div>
+                <h2 className="circle-detail-title">👥 {circle.name}</h2>
+                {circle.description && (
+                  <p className="circle-detail-description">{circle.description}</p>
+                )}
+              </div>
+              <button
+                className="circle-view-members-button"
+                onClick={() => setShowMembers(!showMembers)}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span>Ver miembros ({members.length})</span>
+              </button>
+            </div>
             <p className="circle-detail-count">
               {sharedReviews.length}{' '}
               {sharedReviews.length === 1
@@ -174,6 +251,58 @@ function CircleDetail({ user, onMovieClick }) {
                 : 'películas recomendadas'}
             </p>
           </div>
+
+          {/* Modal de miembros */}
+          {showMembers && (
+            <div className="circle-members-modal-overlay" onClick={() => setShowMembers(false)}>
+              <div className="circle-members-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="circle-members-modal-header">
+                  <h3 className="circle-members-modal-title">Miembros del círculo</h3>
+                  <button
+                    className="circle-members-modal-close"
+                    onClick={() => setShowMembers(false)}
+                    aria-label="Cerrar"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="circle-members-list">
+                  {members.length === 0 ? (
+                    <div className="circle-members-empty">
+                      <p>No hay miembros en este círculo.</p>
+                    </div>
+                  ) : (
+                    members.map((member) => (
+                      <div key={member.user_id} className="circle-member-item">
+                        <div className="circle-member-info">
+                          <span className="circle-member-name">{member.username}</span>
+                          <span className={`circle-member-role ${member.role}`}>
+                            {member.role === 'owner' ? '👑 Creador' : '👤 Miembro'}
+                          </span>
+                        </div>
+                        {userRole === 'owner' && member.user_id !== user.id && (
+                          <button
+                            className="circle-member-remove"
+                            onClick={() => handleRemoveMember(member.user_id)}
+                            disabled={removingMember === member.user_id}
+                            title="Eliminar miembro"
+                          >
+                            {removingMember === member.user_id ? (
+                              <div className="spinner-small" />
+                            ) : (
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {sharedReviews.length === 0 ? (
             <div className="circle-detail-empty-reviews">

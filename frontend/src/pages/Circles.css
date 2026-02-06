@@ -460,21 +460,39 @@
   box-shadow: 0 16px 40px rgba(255, 76, 126, 0.5);
 }
 
-.circles-delete-button {
+.circles-card-actions {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.circles-edit-button,
+.circles-delete-button {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 0.5rem;
   padding: 0.4rem;
-  color: #ef4444;
+  color: #3b82f6;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+}
+
+.circles-delete-button {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.circles-edit-button:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: #3b82f6;
+  transform: scale(1.1);
 }
 
 .circles-delete-button:hover {
@@ -483,6 +501,7 @@
   transform: scale(1.1);
 }
 
+.circles-edit-button svg,
 .circles-delete-button svg {
   width: 18px;
   height: 18px;

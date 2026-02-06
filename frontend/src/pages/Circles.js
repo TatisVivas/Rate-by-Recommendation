@@ -13,8 +13,10 @@ function Circles({ user }) {
   const [error, setError] = useState(null);
   const [copiedCircleId, setCopiedCircleId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCircle, setEditingCircle] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const loadCircles = async () => {
     if (!user || !supabase) return;
@@ -102,6 +104,7 @@ function Circles({ user }) {
       setName('');
       setDescription('');
       setIsModalOpen(false);
+      setEditingCircle(null);
       await loadCircles();
     } catch (err) {
       console.error('Error al crear círculo:', err);
@@ -167,6 +170,50 @@ function Circles({ user }) {
     }
   };
 
+  const handleEditCircle = (circle) => {
+    setEditingCircle(circle);
+    setName(circle.name);
+    setDescription(circle.description || '');
+    setError(null);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!user || !supabase || !editingCircle) return;
+    if (!name.trim()) {
+      setError('El nombre del círculo es obligatorio.');
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase
+        .from('circles')
+        .update({
+          name: name.trim(),
+          description: description.trim() || null,
+        })
+        .eq('id', editingCircle.id)
+        .eq('owner_id', user.id); // Solo si es el dueño
+
+      if (error) throw error;
+
+      setName('');
+      setDescription('');
+      setEditingCircle(null);
+      setIsModalOpen(false);
+      await loadCircles();
+    } catch (err) {
+      console.error('Error al editar círculo:', err);
+      setError('No se pudo editar el círculo. Intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="circles-container">
       <div className="circles-header">
@@ -179,7 +226,13 @@ function Circles({ user }) {
           </div>
           <button
             className="circles-create-group-button"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setEditingCircle(null);
+              setName('');
+              setDescription('');
+              setError(null);
+              setIsModalOpen(true);
+            }}
           >
             <span className="circles-create-icon">+</span>
             <span>Crear grupo</span>
@@ -201,7 +254,13 @@ function Circles({ user }) {
           </p>
           <button
             className="circles-create-group-button-empty"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setEditingCircle(null);
+              setName('');
+              setDescription('');
+              setError(null);
+              setIsModalOpen(true);
+            }}
           >
             <span className="circles-create-icon">+</span>
             <span>Crear grupo</span>
@@ -212,16 +271,29 @@ function Circles({ user }) {
           {circles.map((circle) => (
             <div key={circle.id} className="circles-card">
               {circle.userRole === 'owner' && (
-                <button
-                  className="circles-delete-button"
-                  onClick={() => setDeleteConfirm(circle)}
-                  title="Eliminar círculo"
-                  aria-label="Eliminar círculo"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
+                <div className="circles-card-actions">
+                  <button
+                    className="circles-edit-button"
+                    onClick={() => handleEditCircle(circle)}
+                    title="Editar círculo"
+                    aria-label="Editar círculo"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  <button
+                    className="circles-delete-button"
+                    onClick={() => setDeleteConfirm(circle)}
+                    title="Eliminar círculo"
+                    aria-label="Eliminar círculo"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
               )}
               <div className="circles-card-header">
                 <h3 className="circles-card-name">{circle.name}</h3>
@@ -269,16 +341,25 @@ function Circles({ user }) {
         </div>
       )}
 
-      {/* Modal para crear círculo */}
+      {/* Modal para crear/editar círculo */}
       {isModalOpen && (
-        <div className="circles-modal-overlay" onClick={() => setIsModalOpen(false)}>
+        <div className="circles-modal-overlay" onClick={() => {
+          setIsModalOpen(false);
+          setEditingCircle(null);
+          setName('');
+          setDescription('');
+          setError(null);
+        }}>
           <div className="circles-modal" onClick={(e) => e.stopPropagation()}>
             <div className="circles-modal-header">
-              <h3 className="circles-modal-title">Crear nuevo círculo</h3>
+              <h3 className="circles-modal-title">
+                {editingCircle ? 'Editar círculo' : 'Crear nuevo círculo'}
+              </h3>
               <button
                 className="circles-modal-close"
                 onClick={() => {
                   setIsModalOpen(false);
+                  setEditingCircle(null);
                   setName('');
                   setDescription('');
                   setError(null);
@@ -288,7 +369,7 @@ function Circles({ user }) {
                 ×
               </button>
             </div>
-            <form onSubmit={handleCreateCircle} className="circles-modal-form">
+            <form onSubmit={editingCircle ? handleSaveEdit : handleCreateCircle} className="circles-modal-form">
               <div className="circles-field">
                 <label htmlFor="circle-name">Nombre del círculo</label>
                 <input
@@ -321,6 +402,7 @@ function Circles({ user }) {
                   className="circles-modal-cancel"
                   onClick={() => {
                     setIsModalOpen(false);
+                    setEditingCircle(null);
                     setName('');
                     setDescription('');
                     setError(null);
@@ -331,11 +413,14 @@ function Circles({ user }) {
                 <button
                   type="submit"
                   className="circles-modal-submit"
-                  disabled={creating}
+                  disabled={creating || saving}
                 >
-                  {creating ? 'Creando...' : 'Crear círculo'}
+                  {editingCircle 
+                    ? (saving ? 'Guardando...' : 'Guardar cambios')
+                    : (creating ? 'Creando...' : 'Crear círculo')
+                  }
                 </button>
-          </div>
+              </div>
         </form>
       </div>
     </div>
