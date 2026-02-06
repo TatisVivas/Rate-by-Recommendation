@@ -13,6 +13,8 @@ function Circles({ user }) {
   const [error, setError] = useState(null);
   const [copiedCircleId, setCopiedCircleId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const loadCircles = async () => {
     if (!user || !supabase) return;
@@ -22,7 +24,7 @@ function Circles({ user }) {
     try {
       const { data, error } = await supabase
         .from('circle_members')
-        .select('circle:circles(*)')
+        .select('circle:circles(*), role')
         .eq('user_id', user.id);
 
       if (error) throw error;
@@ -32,7 +34,10 @@ function Circles({ user }) {
       (data || []).forEach((row) => {
         if (row.circle && !seen.has(row.circle.id)) {
           seen.add(row.circle.id);
-          uniqueCircles.push(row.circle);
+          uniqueCircles.push({
+            ...row.circle,
+            userRole: row.role, // Agregar el rol del usuario
+          });
         }
       });
 
@@ -138,6 +143,30 @@ function Circles({ user }) {
     }
   };
 
+  const handleDeleteCircle = async (circleId) => {
+    if (!user || !supabase) return;
+
+    setDeleting(true);
+    try {
+      // Eliminar el círculo (esto también eliminará los miembros y shares por cascade)
+      const { error } = await supabase
+        .from('circles')
+        .delete()
+        .eq('id', circleId)
+        .eq('owner_id', user.id); // Solo si es el dueño
+
+      if (error) throw error;
+
+      setDeleteConfirm(null);
+      await loadCircles();
+    } catch (err) {
+      console.error('Error al eliminar círculo:', err);
+      setError('No se pudo eliminar el círculo. Intenta de nuevo.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="circles-container">
       <div className="circles-header">
@@ -182,6 +211,18 @@ function Circles({ user }) {
         <div className="circles-grid">
           {circles.map((circle) => (
             <div key={circle.id} className="circles-card">
+              {circle.userRole === 'owner' && (
+                <button
+                  className="circles-delete-button"
+                  onClick={() => setDeleteConfirm(circle)}
+                  title="Eliminar círculo"
+                  aria-label="Eliminar círculo"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              )}
               <div className="circles-card-header">
                 <h3 className="circles-card-name">{circle.name}</h3>
                 {circle.description && (
@@ -294,8 +335,52 @@ function Circles({ user }) {
                 >
                   {creating ? 'Creando...' : 'Crear círculo'}
                 </button>
-              </div>
-            </form>
+          </div>
+        </form>
+      </div>
+    </div>
+      )}
+
+      {/* Modal de confirmación para eliminar */}
+      {deleteConfirm && (
+        <div className="circles-modal-overlay" onClick={() => setDeleteConfirm(null)}>
+          <div className="circles-modal circles-delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="circles-modal-header">
+              <h3 className="circles-modal-title">Eliminar círculo</h3>
+              <button
+                className="circles-modal-close"
+                onClick={() => setDeleteConfirm(null)}
+                aria-label="Cerrar"
+              >
+                ×
+              </button>
+            </div>
+            <div className="circles-delete-content">
+              <p className="circles-delete-message">
+                ¿Estás seguro de que quieres eliminar el círculo <strong>"{deleteConfirm.name}"</strong>?
+              </p>
+              <p className="circles-delete-warning">
+                Esta acción no se puede deshacer. Se eliminarán todas las recomendaciones compartidas en este círculo.
+              </p>
+            </div>
+            <div className="circles-modal-actions">
+              <button
+                type="button"
+                className="circles-modal-cancel"
+                onClick={() => setDeleteConfirm(null)}
+                disabled={deleting}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="circles-modal-delete"
+                onClick={() => handleDeleteCircle(deleteConfirm.id)}
+                disabled={deleting}
+              >
+                {deleting ? 'Eliminando...' : 'Eliminar círculo'}
+              </button>
+            </div>
           </div>
         </div>
       )}
