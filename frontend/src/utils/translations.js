@@ -29,6 +29,17 @@ export const translations = {
     removeFromList: 'Eliminar de la lista',
     loginRequiredWatchlist: 'Debes iniciar sesión para ver tu lista de seguimiento',
     
+    // My Ratings
+    myRatings: 'Mis Calificaciones',
+    moviesRated: 'película calificada',
+    moviesRatedPlural: 'películas calificadas',
+    loadingRatings: 'Cargando tus calificaciones...',
+    emptyRatings: 'Aún no has calificado películas',
+    emptyRatingsText: 'Cuando califiques películas desde la página de inicio, aparecerán aquí para que no pierdas el seguimiento.',
+    loginRequiredRatings: 'Debes iniciar sesión para ver tus calificaciones',
+    yourRating: 'Tu calificación',
+    errorLoadingRatings: 'Error al cargar tus calificaciones',
+    
     // Profile
     myProfile: 'Mi Perfil',
     personalInfo: 'Información Personal',
@@ -173,6 +184,17 @@ export const translations = {
     emptyListText: 'Add movies to your list from the home page by clicking on any movie',
     removeFromList: 'Remove from list',
     loginRequiredWatchlist: 'You must be logged in to view your watchlist',
+    
+    // My Ratings
+    myRatings: 'My Ratings',
+    moviesRated: 'movie rated',
+    moviesRatedPlural: 'movies rated',
+    loadingRatings: 'Loading your ratings...',
+    emptyRatings: "You haven't rated any movies yet",
+    emptyRatingsText: 'When you rate movies from the home page, they will appear here so you can keep track.',
+    loginRequiredRatings: 'You must be logged in to view your ratings',
+    yourRating: 'Your rating',
+    errorLoadingRatings: 'Error loading your ratings',
     
     // Profile
     myProfile: 'My Profile',

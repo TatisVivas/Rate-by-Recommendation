@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import Confirmacion from './pages/Confirmacion';
 import RestablecerContrasena from './pages/RestablecerContrasena';
 import Watchlist from './components/Watchlist';
+import MyRatings from './components/MyRatings';
 import Recommendations from './components/Recommendations';
 import Profile from './components/Profile';
 import MovieModal from './components/MovieModal';
@@ -128,6 +129,10 @@ function App() {
             <Route 
               path="/watchlist" 
               element={<Watchlist user={user} onMovieClick={handleMovieClick} />} 
+            />
+            <Route 
+              path="/my-ratings" 
+              element={<MyRatings user={user} onMovieClick={handleMovieClick} />} 
             />
             <Route 
               path="/recommendations" 

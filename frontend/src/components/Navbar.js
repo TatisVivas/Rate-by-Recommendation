@@ -42,6 +42,12 @@ function Navbar({ user, onLogout }) {
               📋 {t('watchlist')}
             </Link>
             <Link 
+              to="/my-ratings" 
+              className={`navbar-link ${location.pathname === '/my-ratings' ? 'active' : ''}`}
+            >
+              ⭐ {t('myRatings')}
+            </Link>
+            <Link 
               to="/recommendations" 
               className={`navbar-link ${location.pathname === '/recommendations' ? 'active' : ''}`}
             >
