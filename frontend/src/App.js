@@ -6,6 +6,9 @@ import { useTranslation } from './utils/translations';
 import Navbar from './components/Navbar';
 import Auth from './components/Auth';
 import Home from './pages/Home';
+import Circles from './pages/Circles';
+import CircleDetail from './pages/CircleDetail';
+import JoinCircle from './pages/JoinCircle';
 import Confirmacion from './pages/Confirmacion';
 import RestablecerContrasena from './pages/RestablecerContrasena';
 import Watchlist from './components/Watchlist';
@@ -139,6 +142,18 @@ function App() {
               element={<Recommendations user={user} onMovieClick={handleMovieClick} />} 
             />
             <Route 
+              path="/join/:code" 
+              element={<JoinCircle user={user} />} 
+            />
+            <Route 
+              path="/circles" 
+              element={<Circles user={user} />} 
+            />
+            <Route 
+              path="/circles/:id" 
+              element={<CircleDetail user={user} onMovieClick={handleMovieClick} />} 
+            />
+            <Route 
               path="/profile" 
               element={<Profile user={user} onLogout={handleLogout} />} 
             />
@@ -198,7 +213,6 @@ function App() {
               </main>
             } 
           />
-          
           {/* Todas las demás rutas */}
           <Route path="*" element={<ProtectedRoutes />} />
         </Routes>

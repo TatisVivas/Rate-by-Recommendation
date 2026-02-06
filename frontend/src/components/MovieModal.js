@@ -15,6 +15,10 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
   const [ratingSuccess, setRatingSuccess] = useState(false);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [watchlistLoading, setWatchlistLoading] = useState(false);
+  const [circles, setCircles] = useState([]);
+  const [selectedCircleIds, setSelectedCircleIds] = useState([]);
+  const [sharingLoading, setSharingLoading] = useState(false);
+  const [sharingSuccess, setSharingSuccess] = useState(false);
 
   const loadUserReview = useCallback(async (movieId) => {
     if (!user) return;
@@ -59,15 +63,41 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
     }
   }, [user]);
 
+  const loadUserCircles = useCallback(async () => {
+    if (!user || !supabase) return;
+    try {
+      const { data, error } = await supabase
+        .from('circle_members')
+        .select('circle:circles(*)')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      const uniqueCircles = [];
+      const seen = new Set();
+      (data || []).forEach((row) => {
+        if (row.circle && !seen.has(row.circle.id)) {
+          seen.add(row.circle.id);
+          uniqueCircles.push(row.circle);
+        }
+      });
+
+      setCircles(uniqueCircles);
+    } catch (err) {
+      console.error('Error al cargar círculos del usuario:', err);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (movie) {
       fetchMovieDetails(movie.id);
       if (user) {
         loadUserReview(movie.id);
         checkWatchlist(movie.id);
+        loadUserCircles();
       }
     }
-  }, [movie, user, loadUserReview, checkWatchlist]);
+  }, [movie, user, loadUserReview, checkWatchlist, loadUserCircles]);
 
   const fetchMovieDetails = async (movieId) => {
     try {
@@ -135,6 +165,57 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
   const handleSaveReview = async () => {
     if (!movie || !user) return;
     await handleRateMovie(movie.id, rating);
+  };
+
+  const handleToggleCircleSelection = (circleId) => {
+    setSelectedCircleIds((prev) =>
+      prev.includes(circleId)
+        ? prev.filter((id) => id !== circleId)
+        : [...prev, circleId]
+    );
+  };
+
+  const handleShareToCircles = async () => {
+    if (!movie || !user || selectedCircleIds.length === 0) return;
+
+    setSharingLoading(true);
+    setSharingSuccess(false);
+
+    try {
+      const { data: existingReview } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('movie_id', movie.id)
+        .single();
+
+      const reviewId = existingReview?.id;
+
+      if (!reviewId) {
+        console.error('No hay reseña guardada para compartir.');
+        setSharingLoading(false);
+        return;
+      }
+
+      const rows = selectedCircleIds.map((circleId) => ({
+        circle_id: circleId,
+        review_id: reviewId,
+        shared_by: user.id,
+      }));
+
+      const { error } = await supabase
+        .from('circle_review_shares')
+        .upsert(rows, { onConflict: 'circle_id,review_id' });
+
+      if (error) throw error;
+
+      setSharingSuccess(true);
+      setTimeout(() => setSharingSuccess(false), 3000);
+    } catch (err) {
+      console.error('Error al compartir reseña en círculos:', err);
+    } finally {
+      setSharingLoading(false);
+    }
   };
 
   const handleToggleWatchlist = async () => {
@@ -342,6 +423,49 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
                     {watchlistLoading ? '...' : isInWatchlist ? '✓ En Lista' : '+ Agregar a Lista'}
                   </button>
                 </div>
+
+                {circles.length > 0 && (
+                  <div className="circle-share-section">
+                    <h4 className="circle-share-title">👥 Compartir en tus círculos</h4>
+                    <p className="circle-share-subtitle">
+                      Elige en qué círculos quieres que tus amigos vean esta reseña.
+                    </p>
+                    <div className="circle-share-list">
+                      {circles.map((circle) => (
+                        <button
+                          key={circle.id}
+                          type="button"
+                          className={`circle-share-item ${
+                            selectedCircleIds.includes(circle.id) ? 'selected' : ''
+                          }`}
+                          onClick={() => handleToggleCircleSelection(circle.id)}
+                        >
+                          <span className="circle-share-icon">
+                            {selectedCircleIds.includes(circle.id) ? '✓' : '○'}
+                          </span>
+                          <span className="circle-share-name">{circle.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      className="circle-share-button"
+                      onClick={handleShareToCircles}
+                      disabled={
+                        sharingLoading ||
+                        selectedCircleIds.length === 0 ||
+                        rating === 0
+                      }
+                    >
+                      {sharingLoading ? 'Compartiendo...' : 'Compartir reseña en círculos'}
+                    </button>
+                    {sharingSuccess && (
+                      <div className="circle-share-success">
+                        ✅ Reseña compartida con tu(s) círculo(s).
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {ratingLoading && (
                   <div className="rating-loading">

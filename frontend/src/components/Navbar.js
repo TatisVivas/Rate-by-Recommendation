@@ -54,6 +54,12 @@ function Navbar({ user, onLogout }) {
               🎯 {t('recommendations')}
             </Link>
             <Link 
+              to="/circles" 
+              className={`navbar-link ${location.pathname === '/circles' ? 'active' : ''}`}
+            >
+              👥 Círculos
+            </Link>
+            <Link 
               to="/profile" 
               className={`navbar-link ${location.pathname === '/profile' ? 'active' : ''}`}
             >

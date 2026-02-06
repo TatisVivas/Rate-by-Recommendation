@@ -1,0 +1,210 @@
+.circles-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.circles-header {
+  margin-bottom: 2rem;
+}
+
+.circles-title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.circles-subtitle {
+  color: #cccccc;
+  font-size: 0.95rem;
+}
+
+.circles-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+  gap: 1.5rem;
+}
+
+.circles-form-card,
+.circles-list-card {
+  background: rgba(15, 15, 25, 0.9);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.circles-section-title {
+  font-size: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.circles-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.circles-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.circles-field label {
+  font-size: 0.9rem;
+}
+
+.circles-field input,
+.circles-field textarea {
+  background: rgba(10, 10, 20, 0.9);
+  border-radius: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.6rem 0.75rem;
+  color: #ffffff;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.circles-field input:focus,
+.circles-field textarea:focus {
+  border-color: #ff4c7e;
+  box-shadow: 0 0 0 1px rgba(255, 76, 126, 0.3);
+  background: rgba(15, 15, 30, 0.95);
+}
+
+.circles-create-button {
+  margin-top: 0.5rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #ff4c7e, #ff9a62);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  align-self: flex-start;
+  box-shadow: 0 10px 30px rgba(255, 76, 126, 0.35);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+}
+
+.circles-create-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+  box-shadow: none;
+}
+
+.circles-create-button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 40px rgba(255, 76, 126, 0.45);
+}
+
+.circles-error {
+  background: rgba(255, 77, 106, 0.12);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 77, 106, 0.6);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  color: #ffb3c0;
+}
+
+.circles-loading,
+.circles-empty {
+  padding: 1rem 0.5rem;
+  font-size: 0.95rem;
+  color: #dddddd;
+}
+
+.circles-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.circles-item {
+  padding: 0.85rem 0.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.circles-item:last-child {
+  border-bottom: none;
+}
+
+.circles-item-main {
+  margin-bottom: 0.4rem;
+}
+
+.circles-item-name {
+  font-size: 1rem;
+  margin-bottom: 0.15rem;
+}
+
+.circles-item-description {
+  font-size: 0.9rem;
+  color: #cfcfcf;
+}
+
+.circles-item-invite {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.circles-invite-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #aaaaaa;
+}
+
+.circles-invite-input {
+  width: 100%;
+  background: rgba(10, 10, 20, 0.95);
+  border-radius: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 0.45rem 0.65rem;
+  color: #ffffff;
+  font-size: 0.9rem;
+  outline: none;
+  cursor: text;
+}
+
+.circles-invite-input:focus {
+  border-color: #ff9a62;
+  box-shadow: 0 0 0 1px rgba(255, 154, 98, 0.35);
+}
+
+.circles-invite-hint {
+  font-size: 0.8rem;
+  color: #b5b5b5;
+}
+
+.circles-view-button {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #f97316, #fb7185);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(248, 113, 113, 0.35);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  align-self: flex-start;
+}
+
+.circles-view-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(248, 113, 113, 0.45);
+}
+
+@media (max-width: 900px) {
+  .circles-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
