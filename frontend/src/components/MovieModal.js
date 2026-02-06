@@ -28,7 +28,7 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
         .single();
 
       if (data) {
-        setRating(data.rating);
+        setRating(Number(data.rating) || 0);
         setReviewContent(data.content || '');
       } else {
         setRating(0);
@@ -171,29 +171,68 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
     }
   };
 
+  const formatRating = (value) => {
+    const n = Number(value);
+    return Number.isInteger(n) ? String(n) : n.toFixed(1);
+  };
+
+  const getStarFill = (starIndex) => {
+    const r = hoveredRating || rating;
+    if (r >= starIndex) return 100;
+    if (r >= starIndex - 0.5) return 50;
+    return 0;
+  };
+
+  const starPath = 'M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 17l-6.3 4.4 2.3-7.4-6-4.6h7.6L12 2z';
+
   const StarRating = ({ movieId, currentRating, onRate }) => {
     const stars = [1, 2, 3, 4, 5];
 
     return (
       <div className="star-rating-container">
-        <p className="rating-label">Califica esta película (1-5 estrellas):</p>
-        <div className="star-rating">
-          {stars.map((star) => (
-            <button
-              key={star}
-              type="button"
-              className={`star ${star <= (hoveredRating || currentRating) ? 'filled' : ''}`}
-              onClick={() => onRate(movieId, star)}
-              onMouseEnter={() => setHoveredRating(star)}
-              onMouseLeave={() => setHoveredRating(0)}
-              disabled={ratingLoading}
-            >
-              ⭐
-            </button>
-          ))}
+        <p className="rating-label">Califica esta película (0.5 a 5 estrellas):</p>
+        <div className="star-rating star-rating-half">
+          {stars.map((starIndex) => {
+            const fillPct = getStarFill(starIndex);
+            return (
+              <div key={starIndex} className="star-wrapper star-wrapper-svg">
+                <svg
+                  className="star-svg"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path className="star-svg-bg" d={starPath} fill="currentColor" />
+                  <path
+                    className="star-svg-fill"
+                    d={starPath}
+                    fill="currentColor"
+                    style={{ clipPath: `inset(0 ${100 - fillPct}% 0 0)` }}
+                  />
+                </svg>
+                <button
+                  type="button"
+                  className="star-hit star-left"
+                  onClick={() => onRate(movieId, starIndex - 0.5)}
+                  onMouseEnter={() => setHoveredRating(starIndex - 0.5)}
+                  onMouseLeave={() => setHoveredRating(0)}
+                  disabled={ratingLoading}
+                  aria-label={`${starIndex - 0.5} de 5`}
+                />
+                <button
+                  type="button"
+                  className="star-hit star-right"
+                  onClick={() => onRate(movieId, starIndex)}
+                  onMouseEnter={() => setHoveredRating(starIndex)}
+                  onMouseLeave={() => setHoveredRating(0)}
+                  disabled={ratingLoading}
+                  aria-label={`${starIndex} de 5`}
+                />
+              </div>
+            );
+          })}
         </div>
         <p className="rating-value">
-          {(hoveredRating || currentRating) > 0 ? `${hoveredRating || currentRating}/5` : 'Selecciona una calificación'}
+          {(hoveredRating || currentRating) > 0 ? `${formatRating(hoveredRating || currentRating)}/5` : 'Selecciona una calificación'}
         </p>
       </div>
     );

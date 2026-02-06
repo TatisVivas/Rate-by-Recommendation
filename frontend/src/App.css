@@ -672,6 +672,80 @@
   flex-wrap: wrap;
 }
 
+/* Medias estrellas: contenedor por estrella */
+.star-rating-half {
+  gap: 0.15rem;
+}
+
+.star-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+}
+
+/* Estrellas SVG: relleno limpio por 0.5 */
+.star-wrapper-svg {
+  width: 3rem;
+  height: 3rem;
+}
+
+.star-wrapper-svg .star-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.star-wrapper-svg .star-svg-bg {
+  color: rgba(255, 255, 255, 0.25);
+  transition: color 0.15s ease;
+}
+
+:root.light-theme .star-wrapper-svg .star-svg-bg,
+.light-theme .star-wrapper-svg .star-svg-bg {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+.star-wrapper-svg .star-svg-fill {
+  color: #f5c842;
+  transition: clip-path 0.15s ease;
+}
+
+.star-hit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.star-hit:hover {
+  background: rgba(255, 215, 0, 0.15);
+}
+
+.star-hit.star-left {
+  left: 0;
+  width: 50%;
+}
+
+.star-hit.star-right {
+  left: 50%;
+  width: 50%;
+}
+
+.star-hit:disabled {
+  cursor: not-allowed;
+}
+
+.star-hit:disabled:hover {
+  background: transparent;
+}
+
 .star {
   background: none;
   border: none;

@@ -126,7 +126,7 @@ function MyRatings({ user, onMovieClick }) {
                     }}
                   />
                   <div className="my-ratings-badge">
-                    {movie.userRating}/5
+                    {Number.isInteger(Number(movie.userRating)) ? Number(movie.userRating) : Number(movie.userRating).toFixed(1)}/5
                   </div>
                 </div>
                 <div className="my-ratings-info">
@@ -135,7 +135,7 @@ function MyRatings({ user, onMovieClick }) {
                     <p className="my-ratings-year">{new Date(movie.release_date).getFullYear()}</p>
                   )}
                   <p className="my-ratings-user-rating">
-                    ⭐ {t('yourRating')}: {movie.userRating}/5
+                    ⭐ {t('yourRating')}: {Number.isInteger(Number(movie.userRating)) ? Number(movie.userRating) : Number(movie.userRating).toFixed(1)}/5
                   </p>
                 </div>
               </div>
