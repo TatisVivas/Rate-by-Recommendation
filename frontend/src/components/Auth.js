@@ -102,6 +102,18 @@ function Auth({ onAuthChange }) {
           password,
         });
 
+        // Usuario ya existe: Supabase puede devolver error o session null
+        const isAlreadyRegistered =
+          (error && /already registered|already exists|user already|duplicate|already been registered/i.test(error.message)) ||
+          (!error && data?.user && !data?.session);
+
+        if (isAlreadyRegistered) {
+          setError(null);
+          setMessage(t('emailAlreadyExists'));
+          setIsLogin(true);
+          return;
+        }
+
         if (error) throw error;
 
         // Crear perfil
@@ -213,7 +225,7 @@ function Auth({ onAuthChange }) {
         )}
 
         {message && (
-          <div className={`auth-message ${!isLogin && message === t('registerSuccess') ? 'auth-message-important' : ''}`}>
+          <div className={`auth-message ${!isLogin && message === t('registerSuccess') ? 'auth-message-important' : ''} ${message === t('emailAlreadyExists') ? 'auth-message-important' : ''}`}>
             <p>{message}</p>
             {!isLogin && message === t('registerSuccess') && (
               <div className="email-verification-notice">
