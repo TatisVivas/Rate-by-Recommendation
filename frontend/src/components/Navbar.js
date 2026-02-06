@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from '../utils/translations';
 import { usePreferences } from '../context/PreferencesContext';
@@ -8,6 +8,15 @@ function Navbar({ user, onLogout }) {
   const location = useLocation();
   const { preferences } = usePreferences();
   const t = useTranslation(preferences.language);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
 
   return (
     <nav className="navbar">
@@ -15,7 +24,10 @@ function Navbar({ user, onLogout }) {
         <Link 
           to="/" 
           className="navbar-logo"
-          onClick={() => window.location.reload()}
+          onClick={() => {
+            window.location.reload();
+            closeMenu();
+          }}
         >
           <div className="navbar-logo-container">
             <img 
@@ -28,44 +40,64 @@ function Navbar({ user, onLogout }) {
         </Link>
         
         {user && (
-          <div className="navbar-menu">
-            <Link 
-              to="/" 
-              className={`navbar-link ${location.pathname === '/' ? 'active' : ''}`}
+          <>
+            <button
+              className="navbar-toggle"
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+              aria-expanded={isMenuOpen}
             >
-              🏠 {t('home')}
-            </Link>
-            <Link 
-              to="/watchlist" 
-              className={`navbar-link ${location.pathname === '/watchlist' ? 'active' : ''}`}
-            >
-              📋 {t('watchlist')}
-            </Link>
-            <Link 
-              to="/my-ratings" 
-              className={`navbar-link ${location.pathname === '/my-ratings' ? 'active' : ''}`}
-            >
-              ⭐ {t('myRatings')}
-            </Link>
-            <Link 
-              to="/recommendations" 
-              className={`navbar-link ${location.pathname === '/recommendations' ? 'active' : ''}`}
-            >
-              🎯 {t('recommendations')}
-            </Link>
-            <Link 
-              to="/circles" 
-              className={`navbar-link ${location.pathname === '/circles' ? 'active' : ''}`}
-            >
-              👥 Círculos
-            </Link>
-            <Link 
-              to="/profile" 
-              className={`navbar-link ${location.pathname === '/profile' ? 'active' : ''}`}
-            >
-              👤 {t('profile')}
-            </Link>
-          </div>
+              <span className={`navbar-toggle-icon ${isMenuOpen ? 'open' : ''}`}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
+            <div className={`navbar-menu ${isMenuOpen ? 'open' : ''}`}>
+              <Link 
+                to="/" 
+                className={`navbar-link ${location.pathname === '/' ? 'active' : ''}`}
+                onClick={closeMenu}
+              >
+                🏠 {t('home')}
+              </Link>
+              <Link 
+                to="/watchlist" 
+                className={`navbar-link ${location.pathname === '/watchlist' ? 'active' : ''}`}
+                onClick={closeMenu}
+              >
+                📋 {t('watchlist')}
+              </Link>
+              <Link 
+                to="/my-ratings" 
+                className={`navbar-link ${location.pathname === '/my-ratings' ? 'active' : ''}`}
+                onClick={closeMenu}
+              >
+                ⭐ {t('myRatings')}
+              </Link>
+              <Link 
+                to="/recommendations" 
+                className={`navbar-link ${location.pathname === '/recommendations' ? 'active' : ''}`}
+                onClick={closeMenu}
+              >
+                🎯 {t('recommendations')}
+              </Link>
+              <Link 
+                to="/circles" 
+                className={`navbar-link ${location.pathname === '/circles' ? 'active' : ''}`}
+                onClick={closeMenu}
+              >
+                👥 Círculos
+              </Link>
+              <Link 
+                to="/profile" 
+                className={`navbar-link ${location.pathname === '/profile' ? 'active' : ''}`}
+                onClick={closeMenu}
+              >
+                👤 {t('profile')}
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </nav>
