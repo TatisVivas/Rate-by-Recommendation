@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../utils/translations';
 import './Auth.css';
 
 if (!supabase) {
@@ -16,6 +17,39 @@ function Auth({ onAuthChange }) {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Obtener idioma desde localStorage
+  const getLanguage = () => {
+    const savedPrefs = localStorage.getItem('preferences');
+    if (savedPrefs) {
+      try {
+        const parsed = JSON.parse(savedPrefs);
+        return parsed.language || 'es';
+      } catch (err) {
+        return 'es';
+      }
+    }
+    return 'es';
+  };
+  
+  const [language, setLanguage] = useState(getLanguage());
+  const t = useTranslation(language);
+  
+  // Escuchar cambios en el idioma
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      setLanguage(getLanguage());
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    // También escuchar un evento personalizado para cambios en la misma pestaña
+    window.addEventListener('languageChange', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('languageChange', handleStorageChange);
+    };
+  }, []);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -59,7 +93,7 @@ function Auth({ onAuthChange }) {
           if (profileError) throw profileError;
         }
 
-        setMessage('¡Inicio de sesión exitoso!');
+        setMessage(t('loginSuccess'));
         if (onAuthChange) onAuthChange(data.user);
       } else {
         // Registro
@@ -82,7 +116,7 @@ function Auth({ onAuthChange }) {
         if (profileError) throw profileError;
 
         // No llamar a onAuthChange aquí porque el usuario necesita confirmar el email primero
-        setMessage('¡Registro exitoso!');
+        setMessage(t('registerSuccess'));
       }
     } catch (err) {
       setError(err.message);
@@ -105,7 +139,7 @@ function Auth({ onAuthChange }) {
       const redirectTo = `${window.location.origin}/restablecer-contraseña`;
       const { error: err } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
       if (err) throw err;
-      setMessage('Revisa tu correo: te enviamos un enlace para restablecer tu contraseña. Si no lo ves, revisa la carpeta de spam.');
+      setMessage(t('emailResetSent'));
     } catch (err) {
       setError(err.message);
       console.error('Error al enviar enlace de recuperación:', err);
@@ -119,7 +153,7 @@ function Auth({ onAuthChange }) {
     return (
       <div className="auth-container">
         <div className="auth-card">
-          <h2>Recuperar contraseña</h2>
+          <h2>{t('recoverPassword')}</h2>
           {error && (
             <div className="auth-error"><p>{error}</p></div>
           )}
@@ -130,21 +164,21 @@ function Auth({ onAuthChange }) {
           )}
           {!message && (
             <>
-              <p className="auth-forgot-hint">Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
+              <p className="auth-forgot-hint">{t('forgotPasswordHint')}</p>
               <form onSubmit={handleForgotPassword} className="auth-form">
                 <div className="auth-field">
-                  <label htmlFor="forgot-email">Email</label>
+                  <label htmlFor="forgot-email">{t('email')}</label>
                   <input
                     id="forgot-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tu@email.com"
+                    placeholder={t('emailPlaceholder')}
                     required
                   />
                 </div>
                 <button type="submit" className="auth-button" disabled={loading}>
-                  {loading ? 'Cargando...' : 'Enviar enlace'}
+                  {loading ? t('loading') : t('sendLink')}
                 </button>
               </form>
             </>
@@ -159,7 +193,7 @@ function Auth({ onAuthChange }) {
                 setMessage(null);
               }}
             >
-              ← Volver al inicio de sesión
+              {t('backToLogin')}
             </button>
           </div>
         </div>
@@ -170,7 +204,7 @@ function Auth({ onAuthChange }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>{isLogin ? 'Iniciar Sesión' : 'Registrarse'}</h2>
+        <h2>{isLogin ? t('login') : t('register')}</h2>
         
         {error && (
           <div className="auth-error">
@@ -179,19 +213,19 @@ function Auth({ onAuthChange }) {
         )}
 
         {message && (
-          <div className={`auth-message ${!isLogin && message.includes('Registro exitoso') ? 'auth-message-important' : ''}`}>
+          <div className={`auth-message ${!isLogin && message === t('registerSuccess') ? 'auth-message-important' : ''}`}>
             <p>{message}</p>
-            {!isLogin && message.includes('Registro exitoso') && (
+            {!isLogin && message === t('registerSuccess') && (
               <div className="email-verification-notice">
-                <p className="email-notice-title">📧 Verifica tu correo electrónico</p>
+                <p className="email-notice-title">📧 {t('emailVerificationNotice')}</p>
                 <p className="email-notice-text">
-                  Hemos enviado un enlace de confirmación a <strong>{email}</strong>
+                  {t('emailVerificationSent')} <strong>{email}</strong>
                 </p>
                 <p className="email-notice-spam">
-                  ⚠️ <strong>Importante:</strong> Si no encuentras el correo, revisa tu carpeta de <strong>spam o correo no deseado</strong>
+                  ⚠️ {t('emailVerificationSpam')}
                 </p>
                 <p className="email-notice-hint">
-                  Una vez que confirmes tu cuenta, podrás iniciar sesión normalmente.
+                  {t('emailVerificationConfirm')}
                 </p>
               </div>
             )}
@@ -201,39 +235,39 @@ function Auth({ onAuthChange }) {
         <form onSubmit={handleAuth} className="auth-form">
           {!isLogin && (
             <div className="auth-field">
-              <label htmlFor="username">Nombre de usuario</label>
+              <label htmlFor="username">{t('username')}</label>
               <input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Tu nombre de usuario"
+                placeholder={t('usernamePlaceholder')}
                 required={!isLogin}
               />
             </div>
           )}
 
           <div className="auth-field">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{t('email')}</label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
+              placeholder={t('emailPlaceholder')}
               required
             />
           </div>
 
           <div className="auth-field">
-            <label htmlFor="password">Contraseña</label>
+            <label htmlFor="password">{t('password')}</label>
             <div className="auth-password-wrap">
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
                 required
                 minLength={6}
               />
@@ -241,8 +275,8 @@ function Auth({ onAuthChange }) {
                 type="button"
                 className="auth-password-toggle"
                 onClick={() => setShowPassword((v) => !v)}
-                title={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                title={showPassword ? t('hidePassword') : t('showPassword')}
+                aria-label={showPassword ? t('hidePassword') : t('showPassword')}
               >
                 {showPassword ? (
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -260,7 +294,7 @@ function Auth({ onAuthChange }) {
           </div>
 
           <button type="submit" className="auth-button" disabled={loading}>
-            {loading ? 'Cargando...' : isLogin ? 'Iniciar Sesión' : 'Registrarse'}
+            {loading ? t('loading') : isLogin ? t('login') : t('register')}
           </button>
 
           {isLogin && (
@@ -274,7 +308,7 @@ function Auth({ onAuthChange }) {
                   setMessage(null);
                 }}
               >
-                ¿Olvidaste tu contraseña?
+                {t('forgotPassword')}
               </button>
             </div>
           )}
@@ -282,7 +316,7 @@ function Auth({ onAuthChange }) {
 
         <div className="auth-switch">
           <p>
-            {isLogin ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
+            {isLogin ? t('noAccount') + ' ' : t('haveAccount') + ' '}
             <button
               type="button"
               className="auth-link"
@@ -292,7 +326,7 @@ function Auth({ onAuthChange }) {
                 setMessage(null);
               }}
             >
-              {isLogin ? 'Regístrate' : 'Inicia sesión'}
+              {isLogin ? t('signUp') : t('signIn')}
             </button>
           </p>
         </div>

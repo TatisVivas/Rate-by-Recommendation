@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../utils/translations';
 import './RestablecerContrasena.css';
 
 const RestablecerContrasena = () => {
@@ -12,6 +13,39 @@ const RestablecerContrasena = () => {
   const [success, setSuccess] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [sessionReady, setSessionReady] = useState(false);
+  
+  // Obtener idioma desde localStorage
+  const getLanguage = () => {
+    const savedPrefs = localStorage.getItem('preferences');
+    if (savedPrefs) {
+      try {
+        const parsed = JSON.parse(savedPrefs);
+        return parsed.language || 'es';
+      } catch (err) {
+        return 'es';
+      }
+    }
+    return 'es';
+  };
+  
+  const [language, setLanguage] = useState(getLanguage());
+  const t = useTranslation(language);
+  
+  // Escuchar cambios en el idioma
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setLanguage(getLanguage());
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('languageChange', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('languageChange', handleStorageChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!supabase) {
@@ -31,11 +65,11 @@ const RestablecerContrasena = () => {
     e.preventDefault();
     setError(null);
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+      setError(t('passwordMismatch'));
       return;
     }
     if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres.');
+      setError(t('passwordMinLength'));
       return;
     }
     if (!supabase) {
@@ -49,7 +83,7 @@ const RestablecerContrasena = () => {
       setSuccess(true);
       setTimeout(() => navigate('/', { replace: true }), 2500);
     } catch (err) {
-      setError(err.message || 'No se pudo actualizar la contraseña. El enlace puede haber caducado.');
+      setError(err.message || t('invalidLinkMessage'));
       console.error('Error al restablecer contraseña:', err);
     } finally {
       setLoading(false);
@@ -61,7 +95,7 @@ const RestablecerContrasena = () => {
       <div className="restablecer-container">
         <div className="restablecer-card">
           <div className="loading-spinner"></div>
-          <p className="loading-text">Comprobando enlace...</p>
+          <p className="loading-text">{t('checkingLink')}</p>
         </div>
       </div>
     );
@@ -71,12 +105,12 @@ const RestablecerContrasena = () => {
     return (
       <div className="restablecer-container">
         <div className="restablecer-card">
-          <h1 className="restablecer-title">Enlace no válido o expirado</h1>
+          <h1 className="restablecer-title">{t('invalidLink')}</h1>
           <p className="restablecer-message">
-            Solicita un nuevo enlace desde la pantalla de inicio de sesión con «¿Olvidaste tu contraseña?».
+            {t('invalidLinkMessage')}
           </p>
           <button type="button" className="confirmacion-button" onClick={() => navigate('/', { replace: true })}>
-            Ir al inicio de sesión
+            {t('goToLogin')}
           </button>
         </div>
       </div>
@@ -93,8 +127,8 @@ const RestablecerContrasena = () => {
               <path className="checkmark-check" d="M30 50 L45 65 L70 35" />
             </svg>
           </div>
-          <h1 className="restablecer-title">Contraseña actualizada</h1>
-          <p className="restablecer-message">Ya puedes iniciar sesión con tu nueva contraseña. Redirigiendo...</p>
+          <h1 className="restablecer-title">{t('passwordUpdated')}</h1>
+          <p className="restablecer-message">{t('passwordUpdatedMessage')}</p>
         </div>
       </div>
     );
@@ -103,8 +137,8 @@ const RestablecerContrasena = () => {
   return (
     <div className="restablecer-container">
       <div className="restablecer-card">
-        <h1 className="restablecer-title">Nueva contraseña</h1>
-        <p className="restablecer-message">Elige una contraseña segura para tu cuenta.</p>
+        <h1 className="restablecer-title">{t('newPasswordTitle')}</h1>
+        <p className="restablecer-message">{t('chooseSecurePassword')}</p>
 
         {error && (
           <div className="auth-error">
@@ -114,38 +148,38 @@ const RestablecerContrasena = () => {
 
         <form onSubmit={handleSubmit} className="auth-form restablecer-form">
           <div className="auth-field">
-            <label htmlFor="new-password">Nueva contraseña</label>
+            <label htmlFor="new-password">{t('newPassword')}</label>
             <input
               id="new-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mínimo 6 caracteres"
+              placeholder={t('minCharacters')}
               required
               minLength={6}
               autoComplete="new-password"
             />
           </div>
           <div className="auth-field">
-            <label htmlFor="confirm-password">Confirmar contraseña</label>
+            <label htmlFor="confirm-password">{t('confirmPassword')}</label>
             <input
               id="confirm-password"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Repite la contraseña"
+              placeholder={t('repeatPassword')}
               required
               minLength={6}
               autoComplete="new-password"
             />
           </div>
           <button type="submit" className="auth-button confirmacion-button" disabled={loading}>
-            {loading ? 'Guardando...' : 'Guardar contraseña'}
+            {loading ? t('saving') : t('savePassword')}
           </button>
         </form>
 
         <button type="button" className="auth-link restablecer-back" onClick={() => navigate('/', { replace: true })}>
-          ← Volver al inicio
+          {t('backToHome')}
         </button>
       </div>
     </div>

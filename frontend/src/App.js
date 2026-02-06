@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import { PreferencesProvider } from './context/PreferencesContext';
+import { useTranslation } from './utils/translations';
 import Navbar from './components/Navbar';
 import Auth from './components/Auth';
 import Home from './pages/Home';
@@ -18,6 +19,39 @@ import './styles/light-theme.css';
 function App() {
   const [user, setUser] = useState(null);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  
+  // Obtener idioma desde localStorage
+  const getLanguage = () => {
+    const savedPrefs = localStorage.getItem('preferences');
+    if (savedPrefs) {
+      try {
+        const parsed = JSON.parse(savedPrefs);
+        return parsed.language || 'es';
+      } catch (err) {
+        return 'es';
+      }
+    }
+    return 'es';
+  };
+  
+  const [language, setLanguage] = useState(getLanguage());
+  const t = useTranslation(language);
+  
+  // Escuchar cambios en el idioma
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setLanguage(getLanguage());
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('languageChange', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('languageChange', handleStorageChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Verificar sesión al cargar
   useEffect(() => {
@@ -69,8 +103,8 @@ function App() {
         <>
           <header className="app-header-auth">
             <div className="header-content">
-              <h1 className="app-title">Rate by Recommendation</h1>
-              <p className="app-subtitle">Inicia sesión para comenzar</p>
+              <h1 className="app-title">{t('appTitle')}</h1>
+              <p className="app-subtitle">{t('appSubtitle')}</p>
             </div>
           </header>
           <main className="app-main">

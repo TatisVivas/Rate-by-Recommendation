@@ -1,12 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../utils/translations';
 import './Confirmacion.css';
 
 const Confirmacion = () => {
   const navigate = useNavigate();
   const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Obtener idioma desde localStorage
+  const getLanguage = () => {
+    const savedPrefs = localStorage.getItem('preferences');
+    if (savedPrefs) {
+      try {
+        const parsed = JSON.parse(savedPrefs);
+        return parsed.language || 'es';
+      } catch (err) {
+        return 'es';
+      }
+    }
+    return 'es';
+  };
+  
+  const [language, setLanguage] = useState(getLanguage());
+  const t = useTranslation(language);
 
   useEffect(() => {
     // Verificar si el usuario está autenticado después de la confirmación
@@ -25,6 +43,22 @@ const Confirmacion = () => {
 
     checkAuth();
   }, []);
+  
+  // Escuchar cambios en el idioma
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setLanguage(getLanguage());
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('languageChange', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('languageChange', handleStorageChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleGoToLogin = () => {
     navigate('/');
@@ -35,7 +69,7 @@ const Confirmacion = () => {
       <div className="confirmacion-container">
         <div className="confirmacion-card">
           <div className="loading-spinner"></div>
-          <p className="loading-text">Verificando tu cuenta...</p>
+          <p className="loading-text">{t('verifyingAccount')}</p>
         </div>
       </div>
     );
@@ -52,26 +86,26 @@ const Confirmacion = () => {
         </div>
         
         <h1 className="confirmacion-title">
-          ¡Gracias por confirmar tu cuenta!
+          {t('thankYouConfirm')}
         </h1>
         
         <p className="confirmacion-message">
-          Tu cuenta ha sido verificada exitosamente. Ahora eres parte de{' '}
+          {t('accountVerified')}{' '}
           <strong className="brand-name">Rate by Recommendation</strong>.
         </p>
         
         <div className="features-list">
           <div className="feature-item">
             <span className="feature-icon">⭐</span>
-            <span>Califica tus películas favoritas</span>
+            <span>{t('featureRate')}</span>
           </div>
           <div className="feature-item">
             <span className="feature-icon">🎯</span>
-            <span>Recibe recomendaciones personalizadas</span>
+            <span>{t('featureRecommendations')}</span>
           </div>
           <div className="feature-item">
             <span className="feature-icon">📋</span>
-            <span>Crea y gestiona tu lista de películas</span>
+            <span>{t('featureWatchlist')}</span>
           </div>
         </div>
 
@@ -80,14 +114,14 @@ const Confirmacion = () => {
             onClick={handleGoToLogin}
             className="confirmacion-button"
           >
-            Comenzar a explorar
+            {t('startExploring')}
           </button>
         </div>
 
         <p className="confirmacion-hint">
           {isVerified 
-            ? 'Ya puedes iniciar sesión y empezar a usar todas las funciones.'
-            : 'Si aún no has iniciado sesión, hazlo ahora para comenzar.'}
+            ? t('alreadyLoggedIn')
+            : t('notLoggedInYet')}
         </p>
       </div>
     </div>
