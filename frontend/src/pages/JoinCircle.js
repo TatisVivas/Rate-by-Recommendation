@@ -1,25 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../utils/translations';
+import { usePreferences } from '../context/PreferencesContext';
 import './Confirmacion.css';
 
 function JoinCircle({ user }) {
   const { code } = useParams();
   const navigate = useNavigate();
+  const { preferences } = usePreferences();
+  const t = useTranslation(preferences.language);
   const [status, setStatus] = useState('loading');
-  const [message, setMessage] = useState('Uniéndote al círculo...');
+  const [message, setMessage] = useState(t('joinCircle'));
 
   useEffect(() => {
     const join = async () => {
       if (!supabase) {
         setStatus('error');
-        setMessage('Supabase no está configurado.');
+        setMessage(t('supabaseNotConfigured'));
         return;
       }
 
       if (!user) {
         setStatus('error');
-        setMessage('Debes iniciar sesión para unirte a un círculo.');
+        setMessage(t('mustLoginToJoin'));
         return;
       }
 
@@ -32,7 +36,7 @@ function JoinCircle({ user }) {
 
         if (error || !circle) {
           setStatus('error');
-          setMessage('No se encontró ningún círculo con este enlace.');
+          setMessage(t('circleNotFound'));
           return;
         }
 
@@ -52,7 +56,7 @@ function JoinCircle({ user }) {
         }
 
         setStatus('success');
-        setMessage(`Te uniste al círculo "${circle.name}". Redirigiendo...`);
+        setMessage(`${t('joiningCircle')} "${circle.name}". ${t('redirecting')}...`);
 
         setTimeout(() => {
           navigate('/circles');
@@ -60,7 +64,7 @@ function JoinCircle({ user }) {
       } catch (err) {
         console.error('Error al unirse al círculo:', err);
         setStatus('error');
-        setMessage('No se pudo completar la unión al círculo. Intenta de nuevo más tarde.');
+        setMessage(t('joinError'));
       }
     };
 
@@ -72,7 +76,7 @@ function JoinCircle({ user }) {
     <div className="confirm-container">
       <div className="confirm-card">
         <h2 className="confirm-title">
-          {status === 'success' ? '✅ ¡Listo!' : status === 'error' ? '⚠️ Ocurrió un problema' : '👥 Uniéndote al círculo'}
+          {status === 'success' ? '✅ ¡Listo!' : status === 'error' ? '⚠️ Ocurrió un problema' : `👥 ${t('joinCircle')}`}
         </h2>
         <p className="confirm-message">{message}</p>
         {status === 'error' && (
@@ -81,7 +85,7 @@ function JoinCircle({ user }) {
             className="confirm-button"
             onClick={() => navigate('/')}
           >
-            Volver al inicio
+            {t('backToHome')}
           </button>
         )}
       </div>

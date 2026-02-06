@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../utils/translations';
+import { usePreferences } from '../context/PreferencesContext';
 import './MovieModal.css';
 
 const API_KEY = process.env.REACT_APP_TMDB_API_KEY || 'YOUR_API_KEY_HERE';
@@ -7,6 +9,8 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
 function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
+  const { preferences } = usePreferences();
+  const t = useTranslation(preferences.language);
   const [movieDetails, setMovieDetails] = useState(null);
   const [rating, setRating] = useState(0);
   const [reviewContent, setReviewContent] = useState('');
@@ -426,9 +430,9 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
 
                 {circles.length > 0 && (
                   <div className="circle-share-section">
-                    <h4 className="circle-share-title">👥 Compartir en tus círculos</h4>
+                    <h4 className="circle-share-title">👥 {t('shareInCircles')}</h4>
                     <p className="circle-share-subtitle">
-                      Elige en qué círculos quieres que tus amigos vean esta reseña.
+                      {t('shareInCirclesSubtitle')}
                     </p>
                     <div className="circle-share-list">
                       {circles.map((circle) => (
@@ -457,11 +461,11 @@ function MovieModal({ movie, user, onClose, onWatchlistUpdate }) {
                         rating === 0
                       }
                     >
-                      {sharingLoading ? 'Compartiendo...' : 'Compartir reseña en círculos'}
+                      {sharingLoading ? t('sharing') : t('shareReview')}
                     </button>
                     {sharingSuccess && (
                       <div className="circle-share-success">
-                        ✅ Reseña compartida con tu(s) círculo(s).
+                        ✅ {t('reviewShared')}
                       </div>
                     )}
                   </div>

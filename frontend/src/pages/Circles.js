@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../utils/translations';
+import { usePreferences } from '../context/PreferencesContext';
 import './Circles.css';
 
 function Circles({ user }) {
+  const { preferences } = usePreferences();
+  const t = useTranslation(preferences.language);
   const navigate = useNavigate();
   const [circles, setCircles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +50,7 @@ function Circles({ user }) {
       setCircles(uniqueCircles);
     } catch (err) {
       console.error('Error al cargar círculos:', err);
-      setError('No se pudieron cargar tus círculos.');
+      setError(t('errorLoadingCircles'));
     } finally {
       setLoading(false);
     }
@@ -108,7 +112,7 @@ function Circles({ user }) {
       await loadCircles();
     } catch (err) {
       console.error('Error al crear círculo:', err);
-      setError('No se pudo crear el círculo. Intenta de nuevo.');
+      setError(t('errorCreatingCircle'));
     } finally {
       setCreating(false);
     }
@@ -164,7 +168,7 @@ function Circles({ user }) {
       await loadCircles();
     } catch (err) {
       console.error('Error al eliminar círculo:', err);
-      setError('No se pudo eliminar el círculo. Intenta de nuevo.');
+      setError(t('errorDeletingCircle'));
     } finally {
       setDeleting(false);
     }
@@ -208,7 +212,7 @@ function Circles({ user }) {
       await loadCircles();
     } catch (err) {
       console.error('Error al editar círculo:', err);
-      setError('No se pudo editar el círculo. Intenta de nuevo.');
+      setError(t('errorEditingCircle'));
     } finally {
       setSaving(false);
     }
@@ -219,9 +223,9 @@ function Circles({ user }) {
       <div className="circles-header">
         <div className="circles-header-content">
           <div>
-            <h2 className="circles-title">👥 Mis Círculos</h2>
+            <h2 className="circles-title">👥 {t('myCircles')}</h2>
             <p className="circles-subtitle">
-              Crea círculos para compartir tus recomendaciones con amigos y familia.
+              {t('circlesSubtitle')}
             </p>
           </div>
           <button
@@ -235,7 +239,7 @@ function Circles({ user }) {
             }}
           >
             <span className="circles-create-icon">+</span>
-            <span>Crear grupo</span>
+            <span>{t('createGroup')}</span>
           </button>
         </div>
       </div>
@@ -243,14 +247,14 @@ function Circles({ user }) {
       {loading ? (
         <div className="circles-loading">
           <div className="spinner" />
-          <p>Cargando círculos...</p>
+          <p>{t('loadingCircles')}</p>
         </div>
       ) : circles.length === 0 ? (
         <div className="circles-empty-state">
           <div className="circles-empty-icon">👥</div>
-          <h3 className="circles-empty-title">Aún no tienes círculos</h3>
+          <h3 className="circles-empty-title">{t('noCircles')}</h3>
           <p className="circles-empty-text">
-            Crea tu primer círculo para empezar a compartir recomendaciones con tus amigos y familia.
+            {t('noCirclesText')}
           </p>
           <button
             className="circles-create-group-button-empty"
@@ -263,7 +267,7 @@ function Circles({ user }) {
             }}
           >
             <span className="circles-create-icon">+</span>
-            <span>Crear grupo</span>
+            <span>{t('createGroup')}</span>
           </button>
         </div>
       ) : (
@@ -302,7 +306,7 @@ function Circles({ user }) {
                 )}
               </div>
               <div className="circles-card-invite">
-                <span className="circles-invite-label">Link de invitación:</span>
+                <span className="circles-invite-label">{t('invitationLink')}</span>
                 <div className="circles-invite-input-container">
                   <input
                     className="circles-invite-input"
@@ -334,7 +338,7 @@ function Circles({ user }) {
                 className="circles-card-button"
                 onClick={() => navigate(`/circles/${circle.id}`)}
               >
-                Ver recomendaciones →
+                {t('viewRecommendations')} →
               </button>
             </div>
           ))}
@@ -353,7 +357,7 @@ function Circles({ user }) {
           <div className="circles-modal" onClick={(e) => e.stopPropagation()}>
             <div className="circles-modal-header">
               <h3 className="circles-modal-title">
-                {editingCircle ? 'Editar círculo' : 'Crear nuevo círculo'}
+                {editingCircle ? t('editCircle') : t('createNewCircle')}
               </h3>
               <button
                 className="circles-modal-close"
@@ -371,24 +375,24 @@ function Circles({ user }) {
             </div>
             <form onSubmit={editingCircle ? handleSaveEdit : handleCreateCircle} className="circles-modal-form">
               <div className="circles-field">
-                <label htmlFor="circle-name">Nombre del círculo</label>
+                <label htmlFor="circle-name">{t('circleName')}</label>
                 <input
                   id="circle-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Familia, Amigos cinéfilos, Compañeros de trabajo..."
+                  placeholder={t('circleNamePlaceholder')}
                   autoFocus
                 />
               </div>
               <div className="circles-field">
-                <label htmlFor="circle-description">Descripción (opcional)</label>
+                <label htmlFor="circle-description">{t('circleDescription')}</label>
                 <textarea
                   id="circle-description"
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe brevemente el propósito del círculo."
+                  placeholder={t('circleDescriptionPlaceholder')}
                 />
               </div>
               {error && (
@@ -408,7 +412,7 @@ function Circles({ user }) {
                     setError(null);
                   }}
                 >
-                  Cancelar
+                  {t('cancel')}
                 </button>
                 <button
                   type="submit"
@@ -416,8 +420,8 @@ function Circles({ user }) {
                   disabled={creating || saving}
                 >
                   {editingCircle 
-                    ? (saving ? 'Guardando...' : 'Guardar cambios')
-                    : (creating ? 'Creando...' : 'Crear círculo')
+                    ? (saving ? t('saving') : t('saveChanges'))
+                    : (creating ? t('creating') : t('createCircle'))
                   }
                 </button>
               </div>
@@ -431,7 +435,7 @@ function Circles({ user }) {
         <div className="circles-modal-overlay" onClick={() => setDeleteConfirm(null)}>
           <div className="circles-modal circles-delete-modal" onClick={(e) => e.stopPropagation()}>
             <div className="circles-modal-header">
-              <h3 className="circles-modal-title">Eliminar círculo</h3>
+              <h3 className="circles-modal-title">{t('deleteCircle')}</h3>
               <button
                 className="circles-modal-close"
                 onClick={() => setDeleteConfirm(null)}
@@ -442,10 +446,10 @@ function Circles({ user }) {
             </div>
             <div className="circles-delete-content">
               <p className="circles-delete-message">
-                ¿Estás seguro de que quieres eliminar el círculo <strong>"{deleteConfirm.name}"</strong>?
+                {t('deleteCircleConfirm')} <strong>"{deleteConfirm.name}"</strong>?
               </p>
               <p className="circles-delete-warning">
-                Esta acción no se puede deshacer. Se eliminarán todas las recomendaciones compartidas en este círculo.
+                {t('deleteCircleWarning')}
               </p>
             </div>
             <div className="circles-modal-actions">
@@ -455,7 +459,7 @@ function Circles({ user }) {
                 onClick={() => setDeleteConfirm(null)}
                 disabled={deleting}
               >
-                Cancelar
+                {t('cancel')}
               </button>
               <button
                 type="button"
@@ -463,7 +467,7 @@ function Circles({ user }) {
                 onClick={() => handleDeleteCircle(deleteConfirm.id)}
                 disabled={deleting}
               >
-                {deleting ? 'Eliminando...' : 'Eliminar círculo'}
+                {deleting ? t('deleting') : t('deleteCircleButton')}
               </button>
             </div>
           </div>

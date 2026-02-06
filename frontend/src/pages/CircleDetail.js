@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../utils/translations';
+import { usePreferences } from '../context/PreferencesContext';
 import './CircleDetail.css';
 
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
@@ -10,6 +12,8 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 function CircleDetail({ user, onMovieClick }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { preferences } = usePreferences();
+  const t = useTranslation(preferences.language);
   const [circle, setCircle] = useState(null);
   const [sharedReviews, setSharedReviews] = useState([]);
   const [members, setMembers] = useState([]);
@@ -155,7 +159,7 @@ function CircleDetail({ user, onMovieClick }) {
       }
     } catch (err) {
       console.error('Error al cargar detalles del círculo:', err);
-      setError(`No se pudieron cargar las recomendaciones del círculo. ${err.message || ''}`);
+      setError(`${t('errorLoadingRecommendations')} ${err.message || ''}`);
     } finally {
       setLoading(false);
     }
@@ -184,7 +188,7 @@ function CircleDetail({ user, onMovieClick }) {
       await loadCircleDetails();
     } catch (err) {
       console.error('Error al eliminar miembro:', err);
-      setError('No se pudo eliminar el miembro. Intenta de nuevo.');
+      setError(t('errorRemovingMember'));
     } finally {
       setRemovingMember(null);
     }
@@ -194,7 +198,7 @@ function CircleDetail({ user, onMovieClick }) {
     return (
       <div className="circle-detail-container">
         <div className="circle-detail-empty">
-          <p>Debes iniciar sesión para ver los detalles del círculo.</p>
+          <p>{t('mustLoginToJoin')}</p>
         </div>
       </div>
     );
@@ -206,13 +210,13 @@ function CircleDetail({ user, onMovieClick }) {
         className="circle-detail-back-button"
         onClick={() => navigate('/circles')}
       >
-        ← Volver a Mis Círculos
+        ← {t('backToCircles')}
       </button>
 
       {loading ? (
         <div className="circle-detail-loading">
           <div className="spinner" />
-          <p>Cargando recomendaciones...</p>
+          <p>{t('loadingRecommendations')}</p>
         </div>
       ) : error ? (
         <div className="circle-detail-error">
@@ -220,7 +224,7 @@ function CircleDetail({ user, onMovieClick }) {
         </div>
       ) : !circle ? (
         <div className="circle-detail-empty">
-          <p>Círculo no encontrado.</p>
+          <p>{t('circleNotFound')}</p>
         </div>
       ) : (
         <>
@@ -241,14 +245,14 @@ function CircleDetail({ user, onMovieClick }) {
                   <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                <span>Ver miembros ({members.length})</span>
+                <span>{t('viewMembers')} ({members.length})</span>
               </button>
             </div>
             <p className="circle-detail-count">
               {sharedReviews.length}{' '}
               {sharedReviews.length === 1
-                ? 'película recomendada'
-                : 'películas recomendadas'}
+                ? t('circleRecommendations')
+                : t('circleRecommendationsPlural')}
             </p>
           </div>
 
@@ -257,7 +261,7 @@ function CircleDetail({ user, onMovieClick }) {
             <div className="circle-members-modal-overlay" onClick={() => setShowMembers(false)}>
               <div className="circle-members-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="circle-members-modal-header">
-                  <h3 className="circle-members-modal-title">Miembros del círculo</h3>
+                  <h3 className="circle-members-modal-title">{t('circleMembers')}</h3>
                   <button
                     className="circle-members-modal-close"
                     onClick={() => setShowMembers(false)}
@@ -269,7 +273,7 @@ function CircleDetail({ user, onMovieClick }) {
                 <div className="circle-members-list">
                   {members.length === 0 ? (
                     <div className="circle-members-empty">
-                      <p>No hay miembros en este círculo.</p>
+                      <p>{t('noMembers')}</p>
                     </div>
                   ) : (
                     members.map((member) => (
@@ -277,7 +281,7 @@ function CircleDetail({ user, onMovieClick }) {
                         <div className="circle-member-info">
                           <span className="circle-member-name">{member.username}</span>
                           <span className={`circle-member-role ${member.role}`}>
-                            {member.role === 'owner' ? '👑 Creador' : '👤 Miembro'}
+                            {member.role === 'owner' ? `👑 ${t('creator')}` : `👤 ${t('member')}`}
                           </span>
                         </div>
                         {userRole === 'owner' && member.user_id !== user.id && (
@@ -285,7 +289,7 @@ function CircleDetail({ user, onMovieClick }) {
                             className="circle-member-remove"
                             onClick={() => handleRemoveMember(member.user_id)}
                             disabled={removingMember === member.user_id}
-                            title="Eliminar miembro"
+                            title={t('removeMember')}
                           >
                             {removingMember === member.user_id ? (
                               <div className="spinner-small" />
@@ -307,9 +311,9 @@ function CircleDetail({ user, onMovieClick }) {
           {sharedReviews.length === 0 ? (
             <div className="circle-detail-empty-reviews">
               <p className="empty-icon">🎬</p>
-              <p className="empty-title">Aún no hay recomendaciones</p>
+              <p className="empty-title">{t('noRecommendations')}</p>
               <p className="empty-text">
-                Cuando los miembros del círculo compartan sus reseñas, aparecerán aquí.
+                {t('noRecommendationsText')}
               </p>
             </div>
           ) : (
@@ -348,11 +352,11 @@ function CircleDetail({ user, onMovieClick }) {
                         </p>
                       )}
                       <div className="circle-detail-reviewer">
-                        <span className="reviewer-label">Recomendado por:</span>
+                        <span className="reviewer-label">{t('recommendedBy')}</span>
                         <span className="reviewer-name">{item.username}</span>
                       </div>
                       <div className="circle-detail-rating">
-                        ⭐ Calificación: {Number.isInteger(Number(item.rating))
+                        ⭐ {t('rating')} {Number.isInteger(Number(item.rating))
                           ? Number(item.rating)
                           : Number(item.rating).toFixed(1)}
                         /5

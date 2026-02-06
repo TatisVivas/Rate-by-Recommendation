@@ -87,7 +87,7 @@ function Navbar({ user, onLogout }) {
                 className={`navbar-link ${location.pathname === '/circles' ? 'active' : ''}`}
                 onClick={closeMenu}
               >
-                👥 Círculos
+                👥 {t('circles')}
               </Link>
               <Link 
                 to="/profile" 
