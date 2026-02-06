@@ -29,7 +29,7 @@ function Recommendations({ user, onMovieClick }) {
     };
   }, []);
 
-  const loadWatchlist = async () => {
+  const loadWatchlist = useCallback(async () => {
     if (!user || !supabase) return [];
 
     try {
@@ -44,7 +44,7 @@ function Recommendations({ user, onMovieClick }) {
       console.error('Error al cargar watchlist:', err);
       return [];
     }
-  };
+  }, [user]);
 
   const fetchMovieRecommendations = async (movieId) => {
     try {
@@ -210,7 +210,7 @@ function Recommendations({ user, onMovieClick }) {
     } finally {
       if (!isCancelled()) setLoading(false);
     }
-  }, [user]);
+  }, [user, loadWatchlist]);
 
   useEffect(() => {
     if (user) {
