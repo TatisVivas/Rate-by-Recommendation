@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { usePreferences } from '../context/PreferencesContext';
 import { useTranslation } from '../utils/translations';
@@ -15,7 +15,7 @@ function MyRatings({ user, onMovieClick }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadRatings = async () => {
+  const loadRatings = useCallback(async () => {
     if (!user || !supabase) return;
 
     setLoading(true);
@@ -59,13 +59,13 @@ function MyRatings({ user, onMovieClick }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, preferences.language, t]);
 
   useEffect(() => {
     if (user) {
       loadRatings();
     }
-  }, [user, preferences.language]);
+  }, [user, loadRatings]);
 
   if (!user) {
     return (
