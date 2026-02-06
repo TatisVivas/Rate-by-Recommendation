@@ -239,6 +239,28 @@
   color: #764ba2;
 }
 
+.auth-forgot-hint {
+  color: #b8b8d4;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+:root.light-theme .auth-forgot-hint,
+.light-theme .auth-forgot-hint {
+  color: #666666;
+}
+
+.auth-forgot-wrap {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.auth-link-forgot {
+  font-size: 0.9rem;
+}
+
 @media (max-width: 480px) {
   .auth-card {
     padding: 2rem 1.5rem;

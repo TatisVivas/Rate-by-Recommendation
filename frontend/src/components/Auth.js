@@ -8,6 +8,7 @@ if (!supabase) {
 
 function Auth({ onAuthChange }) {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -90,6 +91,81 @@ function Auth({ onAuthChange }) {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!supabase) {
+      setError('Supabase no está configurado. Verifica tus variables de entorno.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const redirectTo = `${window.location.origin}/restablecer-contraseña`;
+      const { error: err } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+      if (err) throw err;
+      setMessage('Revisa tu correo: te enviamos un enlace para restablecer tu contraseña. Si no lo ves, revisa la carpeta de spam.');
+    } catch (err) {
+      setError(err.message);
+      console.error('Error al enviar enlace de recuperación:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Vista: ¿Olvidaste tu contraseña? (solo email)
+  if (isForgotPassword) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <h2>Recuperar contraseña</h2>
+          {error && (
+            <div className="auth-error"><p>{error}</p></div>
+          )}
+          {message && (
+            <div className="auth-message auth-message-important">
+              <p>{message}</p>
+            </div>
+          )}
+          {!message && (
+            <>
+              <p className="auth-forgot-hint">Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
+              <form onSubmit={handleForgotPassword} className="auth-form">
+                <div className="auth-field">
+                  <label htmlFor="forgot-email">Email</label>
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="tu@email.com"
+                    required
+                  />
+                </div>
+                <button type="submit" className="auth-button" disabled={loading}>
+                  {loading ? 'Cargando...' : 'Enviar enlace'}
+                </button>
+              </form>
+            </>
+          )}
+          <div className="auth-switch">
+            <button
+              type="button"
+              className="auth-link"
+              onClick={() => {
+                setIsForgotPassword(false);
+                setError(null);
+                setMessage(null);
+              }}
+            >
+              ← Volver al inicio de sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="auth-container">
       <div className="auth-card">
@@ -164,6 +240,22 @@ function Auth({ onAuthChange }) {
           <button type="submit" className="auth-button" disabled={loading}>
             {loading ? 'Cargando...' : isLogin ? 'Iniciar Sesión' : 'Registrarse'}
           </button>
+
+          {isLogin && (
+            <div className="auth-forgot-wrap">
+              <button
+                type="button"
+                className="auth-link auth-link-forgot"
+                onClick={() => {
+                  setIsForgotPassword(true);
+                  setError(null);
+                  setMessage(null);
+                }}
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+          )}
         </form>
 
         <div className="auth-switch">

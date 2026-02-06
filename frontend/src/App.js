@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Auth from './components/Auth';
 import Home from './pages/Home';
 import Confirmacion from './pages/Confirmacion';
+import RestablecerContrasena from './pages/RestablecerContrasena';
 import Watchlist from './components/Watchlist';
 import Recommendations from './components/Recommendations';
 import Profile from './components/Profile';
@@ -146,6 +147,15 @@ function App() {
             element={
               <main className="app-main">
                 <Confirmacion />
+              </main>
+            } 
+          />
+          {/* Ruta pública para restablecer contraseña (desde el email) */}
+          <Route 
+            path="/restablecer-contraseña" 
+            element={
+              <main className="app-main">
+                <RestablecerContrasena />
               </main>
             } 
           />
