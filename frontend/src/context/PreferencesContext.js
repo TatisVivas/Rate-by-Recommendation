@@ -85,12 +85,19 @@ export const PreferencesProvider = ({ children, user }) => {
   };
 
   const savePreferences = async (newPreferences) => {
+    const oldLanguage = preferences.language;
+    const languageChanged = oldLanguage !== newPreferences.language;
+    
     setPreferences(newPreferences);
     applyTheme(newPreferences.theme);
 
     if (!user || !supabase) {
       // Guardar en localStorage si no hay usuario
       localStorage.setItem('preferences', JSON.stringify(newPreferences));
+      // Recargar página si cambió el idioma
+      if (languageChanged) {
+        window.location.reload();
+      }
       return;
     }
 
@@ -104,6 +111,13 @@ export const PreferencesProvider = ({ children, user }) => {
         .eq('id', user.id);
 
       if (error) throw error;
+      
+      // Guardar también en localStorage para persistencia local
+      localStorage.setItem('preferences', JSON.stringify(newPreferences));
+      // Recargar página si cambió el idioma
+      if (languageChanged) {
+        window.location.reload();
+      }
     } catch (err) {
       console.error('Error al guardar preferencias:', err);
       throw err;

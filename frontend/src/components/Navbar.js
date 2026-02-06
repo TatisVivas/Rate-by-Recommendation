@@ -1,9 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from '../utils/translations';
+import { usePreferences } from '../context/PreferencesContext';
 import './Navbar.css';
 
 function Navbar({ user, onLogout }) {
   const location = useLocation();
+  const { preferences } = usePreferences();
+  const t = useTranslation(preferences.language);
 
   return (
     <nav className="navbar">
@@ -29,25 +33,25 @@ function Navbar({ user, onLogout }) {
               to="/" 
               className={`navbar-link ${location.pathname === '/' ? 'active' : ''}`}
             >
-              🏠 Inicio
+              🏠 {t('home')}
             </Link>
             <Link 
               to="/watchlist" 
               className={`navbar-link ${location.pathname === '/watchlist' ? 'active' : ''}`}
             >
-              📋 Mi Lista
+              📋 {t('watchlist')}
             </Link>
             <Link 
               to="/recommendations" 
               className={`navbar-link ${location.pathname === '/recommendations' ? 'active' : ''}`}
             >
-              🎯 Recomendaciones
+              🎯 {t('recommendations')}
             </Link>
             <Link 
               to="/profile" 
               className={`navbar-link ${location.pathname === '/profile' ? 'active' : ''}`}
             >
-              👤 Perfil
+              👤 {t('profile')}
             </Link>
           </div>
         )}

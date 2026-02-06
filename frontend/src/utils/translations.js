@@ -16,6 +16,8 @@ export const translations = {
     noResults: 'No se encontraron películas para',
     welcomeMessage: '👆 Busca una película para comenzar',
     loadingMovies: 'Cargando películas...',
+    trendingMovies: 'Películas en Tendencia',
+    errorLoadingMovies: 'No se pudieron cargar las películas. Verifica tu API key.',
     
     // Watchlist
     myWatchlist: 'Mi Lista de Seguimiento',
@@ -25,6 +27,7 @@ export const translations = {
     emptyList: 'Tu lista está vacía',
     emptyListText: 'Agrega películas a tu lista desde la página de inicio haciendo clic en cualquier película',
     removeFromList: 'Eliminar de la lista',
+    loginRequiredWatchlist: 'Debes iniciar sesión para ver tu lista de seguimiento',
     
     // Profile
     myProfile: 'Mi Perfil',
@@ -72,6 +75,53 @@ export const translations = {
     emailSent: 'Hemos enviado un enlace de confirmación a',
     checkSpam: 'Importante: Si no encuentras el correo, revisa tu carpeta de spam o correo no deseado',
     confirmAccount: 'Una vez que confirmes tu cuenta, podrás iniciar sesión normalmente',
+    password: 'Contraseña',
+    passwordPlaceholder: '••••••••',
+    loginSuccess: '¡Inicio de sesión exitoso!',
+    registerSuccess: '¡Registro exitoso!',
+    forgotPassword: '¿Olvidaste tu contraseña?',
+    recoverPassword: 'Recuperar contraseña',
+    backToLogin: '← Volver al inicio de sesión',
+    forgotPasswordHint: 'Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.',
+    sendLink: 'Enviar enlace',
+    emailVerificationNotice: 'Verifica tu correo electrónico',
+    emailVerificationSent: 'Hemos enviado un enlace de confirmación a',
+    emailVerificationSpam: 'Importante: Si no encuentras el correo, revisa tu carpeta de spam o correo no deseado',
+    emailVerificationConfirm: 'Una vez que confirmes tu cuenta, podrás iniciar sesión normalmente.',
+    emailResetSent: 'Revisa tu correo: te enviamos un enlace para restablecer tu contraseña. Si no lo ves, revisa la carpeta de spam.',
+    showPassword: 'Ver contraseña',
+    hidePassword: 'Ocultar contraseña',
+    usernamePlaceholder: 'Tu nombre de usuario',
+    emailPlaceholder: 'tu@email.com',
+    
+    // Reset Password
+    newPassword: 'Nueva contraseña',
+    newPasswordTitle: 'Nueva contraseña',
+    confirmPassword: 'Confirmar contraseña',
+    passwordMismatch: 'Las contraseñas no coinciden.',
+    passwordMinLength: 'La contraseña debe tener al menos 6 caracteres.',
+    passwordUpdated: 'Contraseña actualizada',
+    passwordUpdatedMessage: 'Ya puedes iniciar sesión con tu nueva contraseña. Redirigiendo...',
+    savePassword: 'Guardar contraseña',
+    checkingLink: 'Comprobando enlace...',
+    invalidLink: 'Enlace no válido o expirado',
+    invalidLinkMessage: 'Solicita un nuevo enlace desde la pantalla de inicio de sesión con «¿Olvidaste tu contraseña?».',
+    goToLogin: 'Ir al inicio de sesión',
+    backToHome: '← Volver al inicio',
+    chooseSecurePassword: 'Elige una contraseña segura para tu cuenta.',
+    minCharacters: 'Mínimo 6 caracteres',
+    repeatPassword: 'Repite la contraseña',
+    
+    // Confirmation
+    thankYouConfirm: '¡Gracias por confirmar tu cuenta!',
+    accountVerified: 'Tu cuenta ha sido verificada exitosamente. Ahora eres parte de',
+    verifyingAccount: 'Verificando tu cuenta...',
+    startExploring: 'Comenzar a explorar',
+    featureRate: 'Califica tus películas favoritas',
+    featureRecommendations: 'Recibe recomendaciones personalizadas',
+    featureWatchlist: 'Crea y gestiona tu lista de películas',
+    alreadyLoggedIn: 'Ya puedes iniciar sesión y empezar a usar todas las funciones.',
+    notLoggedInYet: 'Si aún no has iniciado sesión, hazlo ahora para comenzar.',
     
     // Recommendations
     recommendations: 'Recomendaciones',
@@ -89,6 +139,10 @@ export const translations = {
     noPopularMovies: 'No hay películas populares disponibles',
     emptyWatchlistTitle: 'Tu lista está vacía',
     emptyWatchlistText: 'Agrega películas a tu lista para recibir recomendaciones personalizadas',
+    
+    // App Header
+    appTitle: 'Rate by Recommendation',
+    appSubtitle: 'Inicia sesión para comenzar',
   },
   en: {
     // Navbar
@@ -107,6 +161,8 @@ export const translations = {
     noResults: 'No movies found for',
     welcomeMessage: '👆 Search for a movie to get started',
     loadingMovies: 'Loading movies...',
+    trendingMovies: 'Trending Movies',
+    errorLoadingMovies: 'Could not load movies. Please check your API key.',
     
     // Watchlist
     myWatchlist: 'My Watchlist',
@@ -116,6 +172,7 @@ export const translations = {
     emptyList: 'Your list is empty',
     emptyListText: 'Add movies to your list from the home page by clicking on any movie',
     removeFromList: 'Remove from list',
+    loginRequiredWatchlist: 'You must be logged in to view your watchlist',
     
     // Profile
     myProfile: 'My Profile',
@@ -163,6 +220,53 @@ export const translations = {
     emailSent: 'We have sent a confirmation link to',
     checkSpam: 'Important: If you cannot find the email, check your spam or junk folder',
     confirmAccount: 'Once you confirm your account, you will be able to sign in normally',
+    password: 'Password',
+    passwordPlaceholder: '••••••••',
+    loginSuccess: 'Login successful!',
+    registerSuccess: 'Registration successful!',
+    forgotPassword: 'Forgot your password?',
+    recoverPassword: 'Recover password',
+    backToLogin: '← Back to login',
+    forgotPasswordHint: 'Enter your email and we will send you a link to reset your password.',
+    sendLink: 'Send link',
+    emailVerificationNotice: 'Verify your email',
+    emailVerificationSent: 'We have sent a confirmation link to',
+    emailVerificationSpam: 'Important: If you cannot find the email, check your spam or junk folder',
+    emailVerificationConfirm: 'Once you confirm your account, you will be able to sign in normally.',
+    emailResetSent: 'Check your email: we sent you a link to reset your password. If you don\'t see it, check your spam folder.',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
+    usernamePlaceholder: 'Your username',
+    emailPlaceholder: 'your@email.com',
+    
+    // Reset Password
+    newPassword: 'New password',
+    newPasswordTitle: 'New password',
+    confirmPassword: 'Confirm password',
+    passwordMismatch: 'Passwords do not match.',
+    passwordMinLength: 'Password must be at least 6 characters.',
+    passwordUpdated: 'Password updated',
+    passwordUpdatedMessage: 'You can now sign in with your new password. Redirecting...',
+    savePassword: 'Save password',
+    checkingLink: 'Checking link...',
+    invalidLink: 'Invalid or expired link',
+    invalidLinkMessage: 'Request a new link from the login screen with "Forgot your password?".',
+    goToLogin: 'Go to login',
+    backToHome: '← Back to home',
+    chooseSecurePassword: 'Choose a secure password for your account.',
+    minCharacters: 'Minimum 6 characters',
+    repeatPassword: 'Repeat password',
+    
+    // Confirmation
+    thankYouConfirm: 'Thank you for confirming your account!',
+    accountVerified: 'Your account has been successfully verified. You are now part of',
+    verifyingAccount: 'Verifying your account...',
+    startExploring: 'Start exploring',
+    featureRate: 'Rate your favorite movies',
+    featureRecommendations: 'Get personalized recommendations',
+    featureWatchlist: 'Create and manage your movie list',
+    alreadyLoggedIn: 'You can now sign in and start using all features.',
+    notLoggedInYet: 'If you haven\'t signed in yet, do it now to get started.',
     
     // Recommendations
     recommendations: 'Recommendations',
@@ -180,6 +284,10 @@ export const translations = {
     noPopularMovies: 'No popular movies available',
     emptyWatchlistTitle: 'Your list is empty',
     emptyWatchlistText: 'Add movies to your list to receive personalized recommendations',
+    
+    // App Header
+    appTitle: 'Rate by Recommendation',
+    appSubtitle: 'Sign in to get started',
   },
 };
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { usePreferences } from '../context/PreferencesContext';
+import { useTranslation } from '../utils/translations';
 import './Watchlist.css';
 
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
@@ -7,6 +9,8 @@ const API_KEY = process.env.REACT_APP_TMDB_API_KEY || 'YOUR_API_KEY_HERE';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 function Watchlist({ user, onMovieClick }) {
+  const { preferences } = usePreferences();
+  const t = useTranslation(preferences.language);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,10 +32,11 @@ function Watchlist({ user, onMovieClick }) {
 
       // Cargar detalles de cada película
       if (data && data.length > 0) {
+        const tmdbLanguage = preferences.language === 'en' ? 'en-US' : 'es-ES';
         const moviePromises = data.map(async (item) => {
           try {
             const response = await fetch(
-              `${TMDB_BASE_URL}/movie/${item.movie_id}?api_key=${API_KEY}&language=es-ES`
+              `${TMDB_BASE_URL}/movie/${item.movie_id}?api_key=${API_KEY}&language=${tmdbLanguage}`
             );
             if (response.ok) {
               return await response.json();
@@ -61,7 +66,7 @@ function Watchlist({ user, onMovieClick }) {
       loadWatchlist();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, preferences.language]);
 
   const handleRemoveFromWatchlist = async (movieId) => {
     if (!user || !supabase) return;
@@ -87,7 +92,7 @@ function Watchlist({ user, onMovieClick }) {
     return (
       <div className="watchlist-container">
         <div className="watchlist-empty">
-          <p>Debes iniciar sesión para ver tu lista de seguimiento</p>
+          <p>{t('loginRequiredWatchlist')}</p>
         </div>
       </div>
     );
@@ -96,9 +101,9 @@ function Watchlist({ user, onMovieClick }) {
   return (
     <div className="watchlist-container">
       <div className="watchlist-header">
-        <h2 className="watchlist-title">📋 Mi Lista de Seguimiento</h2>
+        <h2 className="watchlist-title">📋 {t('myWatchlist')}</h2>
         <p className="watchlist-subtitle">
-          {movies.length} {movies.length === 1 ? 'película guardada' : 'películas guardadas'}
+          {movies.length} {movies.length === 1 ? t('moviesSaved') : t('moviesSavedPlural')}
         </p>
       </div>
 
@@ -112,22 +117,23 @@ function Watchlist({ user, onMovieClick }) {
       {loading ? (
         <div className="watchlist-loading">
           <div className="spinner"></div>
-          <p>Cargando tu lista...</p>
+          <p>{t('loadingList')}</p>
         </div>
       ) : movies.length === 0 ? (
         <div className="watchlist-empty">
           <p className="empty-icon">📭</p>
-          <p className="empty-title">Tu lista está vacía</p>
+          <p className="empty-title">{t('emptyList')}</p>
           <p className="empty-text">
-            Agrega películas a tu lista desde la página de inicio haciendo clic en cualquier película
+            {t('emptyListText')}
           </p>
         </div>
       ) : (
         <div className="watchlist-grid">
           {movies.map((movie) => {
+            const noImageText = preferences.language === 'en' ? 'No+Image' : 'Sin+Imagen';
             const posterUrl = movie.poster_path 
               ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}`
-              : 'https://via.placeholder.com/500x750?text=Sin+Imagen';
+              : `https://via.placeholder.com/500x750?text=${noImageText}`;
 
             return (
               <div key={movie.id} className="watchlist-card">
@@ -136,7 +142,7 @@ function Watchlist({ user, onMovieClick }) {
                     src={posterUrl} 
                     alt={movie.title}
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/500x750?text=Sin+Imagen';
+                      e.target.src = `https://via.placeholder.com/500x750?text=${noImageText}`;
                     }}
                   />
                   <button
@@ -145,7 +151,7 @@ function Watchlist({ user, onMovieClick }) {
                       e.stopPropagation();
                       handleRemoveFromWatchlist(movie.id);
                     }}
-                    title="Eliminar de la lista"
+                    title={t('removeFromList')}
                   >
                     ×
                   </button>

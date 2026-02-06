@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { usePreferences } from '../context/PreferencesContext';
+import { useTranslation } from '../utils/translations';
 import './Home.css';
 
 const API_KEY = process.env.REACT_APP_TMDB_API_KEY || 'YOUR_API_KEY_HERE';
@@ -7,6 +9,8 @@ const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 const TMDB_BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/w1280';
 
 function Home({ user, onMovieClick }) {
+  const { preferences } = usePreferences();
+  const t = useTranslation(preferences.language);
   const [searchQuery, setSearchQuery] = useState('');
   const [movies, setMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -16,7 +20,8 @@ function Home({ user, onMovieClick }) {
 
   useEffect(() => {
     loadTrendingMovies();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferences.language]);
 
   // Limpiar resultados cuando el campo de búsqueda esté vacío
   useEffect(() => {
@@ -29,8 +34,9 @@ function Home({ user, onMovieClick }) {
   const loadTrendingMovies = async () => {
     setLoadingTrending(true);
     try {
+      const tmdbLanguage = preferences.language === 'en' ? 'en-US' : 'es-ES';
       const response = await fetch(
-        `${TMDB_BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=es-ES`
+        `${TMDB_BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=${tmdbLanguage}`
       );
       if (response.ok) {
         const data = await response.json();
@@ -54,7 +60,8 @@ function Home({ user, onMovieClick }) {
     setError(null);
 
     try {
-      const url = `${TMDB_BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=es-ES`;
+      const tmdbLanguage = preferences.language === 'en' ? 'en-US' : 'es-ES';
+      const url = `${TMDB_BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=${tmdbLanguage}`;
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -64,7 +71,7 @@ function Home({ user, onMovieClick }) {
       const data = await response.json();
       setMovies(data.results || []);
     } catch (err) {
-      setError('No se pudieron cargar las películas. Verifica tu API key.');
+      setError(t('errorLoadingMovies') || 'No se pudieron cargar las películas. Verifica tu API key.');
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -72,9 +79,10 @@ function Home({ user, onMovieClick }) {
   };
 
   const MovieCard = ({ movie }) => {
+    const noImageText = preferences.language === 'en' ? 'No+Image' : 'Sin+Imagen';
     const posterUrl = movie.poster_path 
       ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}`
-      : 'https://via.placeholder.com/500x750?text=Sin+Imagen';
+      : `https://via.placeholder.com/500x750?text=${noImageText}`;
 
     return (
       <div className="movie-card" onClick={() => onMovieClick(movie)}>
@@ -83,7 +91,7 @@ function Home({ user, onMovieClick }) {
             src={posterUrl} 
             alt={movie.title}
             onError={(e) => {
-              e.target.src = 'https://via.placeholder.com/500x750?text=Sin+Imagen';
+              e.target.src = `https://via.placeholder.com/500x750?text=${noImageText}`;
             }}
           />
         </div>
@@ -119,8 +127,8 @@ function Home({ user, onMovieClick }) {
         
         <div className="hero-content">
           <div className="hero-text">
-            <h1 className="hero-title">🎬 Descubre y Califica Películas</h1>
-            <p className="hero-subtitle">Encuentra tus películas favoritas y comparte tus opiniones</p>
+            <h1 className="hero-title">🎬 {t('discover')}</h1>
+            <p className="hero-subtitle">{t('discoverSubtitle')}</p>
           </div>
           
           <div className="search-container">
@@ -128,12 +136,12 @@ function Home({ user, onMovieClick }) {
               <input
                 type="text"
                 className="search-input"
-                placeholder="Busca una película..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <button type="submit" className="search-button" disabled={loading}>
-                {loading ? 'Buscando...' : '🔍 Buscar'}
+                {loading ? t('searching') : `🔍 ${t('search')}`}
               </button>
             </form>
           </div>
@@ -142,12 +150,13 @@ function Home({ user, onMovieClick }) {
 
       {!loadingTrending && trendingMovies.length > 0 && !searchQuery && (
         <div className="trending-section">
-          <h2 className="trending-title">⭐ Películas en Tendencia</h2>
+          <h2 className="trending-title">⭐ {t('trendingMovies')}</h2>
           <div className="trending-movies">
             {trendingMovies.map((movie) => {
+              const noImageText = preferences.language === 'en' ? 'No+Image' : 'Sin+Imagen';
               const posterUrl = movie.poster_path 
                 ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}`
-                : 'https://via.placeholder.com/500x750?text=Sin+Imagen';
+                : `https://via.placeholder.com/500x750?text=${noImageText}`;
               
               return (
                 <div 
@@ -160,7 +169,7 @@ function Home({ user, onMovieClick }) {
                       src={posterUrl} 
                       alt={movie.title}
                       onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/500x750?text=Sin+Imagen';
+                        e.target.src = `https://via.placeholder.com/500x750?text=${noImageText}`;
                       }}
                     />
                     {movie.vote_average > 0 && (
@@ -188,14 +197,14 @@ function Home({ user, onMovieClick }) {
       {loading && (
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>Cargando películas...</p>
+          <p>{t('loadingMovies')}</p>
         </div>
       )}
 
       {!loading && movies.length > 0 && (
         <div className="movies-container">
           <h2 className="results-title">
-            {movies.length} {movies.length === 1 ? 'resultado encontrado' : 'resultados encontrados'}
+            {movies.length} {movies.length === 1 ? t('resultsFound') : t('resultsFoundPlural')}
           </h2>
           <div className="movies-grid">
             {movies.map((movie) => (
@@ -207,7 +216,7 @@ function Home({ user, onMovieClick }) {
 
       {!loading && !error && movies.length === 0 && searchQuery && (
         <div className="no-results">
-          <p>No se encontraron películas para "{searchQuery}"</p>
+          <p>{t('noResults')} "{searchQuery}"</p>
         </div>
       )}
 
