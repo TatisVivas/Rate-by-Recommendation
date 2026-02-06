@@ -11,6 +11,7 @@ function Circles({ user }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [error, setError] = useState(null);
+  const [copiedCircleId, setCopiedCircleId] = useState(null);
 
   const loadCircles = async () => {
     if (!user || !supabase) return;
@@ -111,6 +112,30 @@ function Circles({ user }) {
     return `${baseUrl}/join/${inviteCode}`;
   };
 
+  const handleCopyLink = async (circleId, inviteCode) => {
+    const url = getInviteUrl(inviteCode);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedCircleId(circleId);
+      setTimeout(() => {
+        setCopiedCircleId(null);
+      }, 2000);
+    } catch (err) {
+      console.error('Error al copiar:', err);
+      // Fallback para navegadores que no soportan clipboard API
+      const input = document.createElement('input');
+      input.value = url;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      setCopiedCircleId(circleId);
+      setTimeout(() => {
+        setCopiedCircleId(null);
+      }, 2000);
+    }
+  };
+
   return (
     <div className="circles-container">
       <div className="circles-header">
@@ -183,13 +208,32 @@ function Circles({ user }) {
                   </div>
                   <div className="circles-item-invite">
                     <span className="circles-invite-label">Link de invitación:</span>
-                    <input
-                      className="circles-invite-input"
-                      type="text"
-                      readOnly
-                      value={getInviteUrl(circle.invite_code)}
-                      onFocus={(e) => e.target.select()}
-                    />
+                    <div className="circles-invite-input-container">
+                      <input
+                        className="circles-invite-input"
+                        type="text"
+                        readOnly
+                        value={getInviteUrl(circle.invite_code)}
+                        onFocus={(e) => e.target.select()}
+                      />
+                      <button
+                        className="circles-copy-button"
+                        onClick={() => handleCopyLink(circle.id, circle.invite_code)}
+                        title="Copiar link"
+                        aria-label="Copiar link de invitación"
+                      >
+                        {copiedCircleId === circle.id ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        ) : (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                     <p className="circles-invite-hint">
                       Comparte este link para que otras personas se unan a tu círculo.
                     </p>
